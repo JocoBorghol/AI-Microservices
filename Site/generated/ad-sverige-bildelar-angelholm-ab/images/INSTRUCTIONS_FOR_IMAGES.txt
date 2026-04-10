@@ -1,0 +1,7 @@
+To add your own images, place them in this folder and name them exactly:
+- hero.jpg (for the hero/header background)
+- about.jpg (for the about section)
+
+Files must be in .jpg format and larger than 1KB.
+
+The system will automatically detect and use these images when you regenerate the website.

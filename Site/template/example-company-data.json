@@ -1,0 +1,84 @@
+{
+  "companyName": "{{COMPANY_NAME}}",
+  "tagline": "{{TAGLINE}}",
+  "logoIcon": "{{LOGO_ICON}}",
+  "year": "{{YEAR}}",
+  
+  "hero": {
+    "title": "{{HERO_TITLE}}",
+    "text": "{{HERO_TEXT}}",
+    "backgroundUrl": "{{HERO_BG_URL}}",
+    "ctaPrimary": "{{CTA_PRIMARY}}",
+    "ctaSecondary": "{{CTA_SECONDARY}}"
+  },
+  
+  "values": [
+    {
+      "icon": "{{VALUE_1_ICON}}",
+      "title": "{{VALUE_1_TITLE}}",
+      "text": "{{VALUE_1_TEXT}}"
+    },
+    {
+      "icon": "{{VALUE_2_ICON}}",
+      "title": "{{VALUE_2_TITLE}}",
+      "text": "{{VALUE_2_TEXT}}"
+    },
+    {
+      "icon": "{{VALUE_3_ICON}}",
+      "title": "{{VALUE_3_TITLE}}",
+      "text": "{{VALUE_3_TEXT}}"
+    }
+  ],
+  
+  "about": {
+    "subtitle": "{{ABOUT_SUBTITLE}}",
+    "title": "{{ABOUT_TITLE}}",
+    "content": "{{ABOUT_CONTENT}}",
+    "imageUrl": "{{ABOUT_IMAGE_URL}}",
+    "cta": "{{ABOUT_CTA}}"
+  },
+  
+  "services": [
+    {
+      "title": "{{SERVICE_1_TITLE}}",
+      "description": "{{SERVICE_1_DESCRIPTION}}",
+      "imageUrl": "{{SERVICE_1_IMAGE_URL}}"
+    },
+    {
+      "title": "{{SERVICE_2_TITLE}}",
+      "description": "{{SERVICE_2_DESCRIPTION}}",
+      "imageUrl": "{{SERVICE_2_IMAGE_URL}}"
+    },
+    {
+      "title": "{{SERVICE_3_TITLE}}",
+      "description": "{{SERVICE_3_DESCRIPTION}}",
+      "imageUrl": "{{SERVICE_3_IMAGE_URL}}"
+    }
+  ],
+  
+  "faqs": [
+    {
+      "icon": "{{FAQ_1_ICON}}",
+      "question": "{{FAQ_1_QUESTION}}",
+      "answer": "{{FAQ_1_ANSWER}}"
+    },
+    {
+      "icon": "{{FAQ_2_ICON}}",
+      "question": "{{FAQ_2_QUESTION}}",
+      "answer": "{{FAQ_2_ANSWER}}"
+    },
+    {
+      "icon": "{{FAQ_3_ICON}}",
+      "question": "{{FAQ_3_QUESTION}}",
+      "answer": "{{FAQ_3_ANSWER}}"
+    }
+  ],
+  
+  "contact": {
+    "intro": "{{CONTACT_INTRO}}",
+    "ownerName": "{{OWNER_NAME}}",
+    "ownerTitle": "{{OWNER_TITLE}}",
+    "phone": "{{PHONE}}",
+    "email": "{{EMAIL}}"
+  }
+}

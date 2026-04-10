@@ -1,0 +1,102 @@
+# ==================================
+# 1. Byggfiler och Kompilerad kod
+# ==================================
+[Bb]in/
+[Oo]bj/
+*.exe
+*.dll
+*.pdb
+
+# ==================================
+# 2. IDE- och redigeringsspecifikt
+# ==================================
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+# ==================================
+# 3. Konfiguration och Hemligheter 
+# ==================================
+appsettings.Development.json
+appsettings.Local.json
+
+# Environment-filer
+.env
+.env.*
+
+# API-nycklar & autentisering
+*api-key*
+*apikey*
+*.key
+secret*.json
+credentials.json
+client_secret.json
+
+# User Secrets (ifall de sparas lokalt i projektet av misstag)
+secrets.json
+.microsoft/usersecrets/
+
+# ==================================
+# 4. Databaser och Loggar
+# ==================================
+# Lokala databaser (SQLite m.m.)
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+
+# EF Core-loggar och övriga applikationsloggar
+*.log
+[Ll]ogs/
+[Ll]og/
+
+# ==================================
+# 5. Paket
+# ==================================
+# NuGet cache & paketmappar
+packages/
+*.nupkg
+
+# ==================================
+# 6. OS-specifika filer
+# ==================================
+# Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+
+# macOS
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+
+# ==================================
+# Övrigt (Vanliga .NET-undantag)
+# ==================================
+TestResults/
+*.coverage
+*.coveragexml
+BenchmarkDotNet.Artifacts/
+
+# ==========================================
+# PRIVAT PLANERING & LOGGAR (ARKIVERAT)
+# ==========================================
+# Gamla planeringsmappar (redan borttagna)
+/PLAN/
+/PLAN 2/
+/VERIFIERING/
+
+# Demo UI (valfritt, kan tas bort)
+/DEMO_UI/
+
+# Exkluderar hela Obsidian-inställningsmappen
+.obsidian/
+
+# Databas (genereras vid körning)
+SalesAssistant.db

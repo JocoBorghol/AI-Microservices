@@ -46,17 +46,17 @@ The platform implements a **microservices architecture** with two independent se
                              │ (Proxy Pattern)
 ┌────────────────────────────▼────────────────────────────────┐
 │    IntelligentSalesAssistant.ContentEngine (Port 5006)      │
-│                     AI Content Engine                        │
-│                                                              │
-│                   ┌────────────────┐                         │
-│                   │ GeminiClient   │                         │
-│                   │  (Typed HTTP)  │                         │
-│                   └────────┬───────┘                         │
-│                            │                                 │
-│                   ┌────────▼───────┐                         │
-│                   │  Gemini API    │                         │
-│                   │  (Google AI)   │                         │
-│                   └────────────────┘                         │
+│                     AI Content Engine                       │
+│                                                             │
+│                   ┌────────────────┐                        │
+│                   │ GeminiClient   │                        │
+│                   │  (Typed HTTP)  │                        │
+│                   └────────┬───────┘                        │
+│                            │                                │
+│                   ┌────────▼───────┐                        │
+│                   │  Gemini API    │                        │
+│                   │  (Google AI)   │                        │
+│                   └────────────────┘                        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -350,7 +350,7 @@ The platform implements a centralized Custom Exception Middleware to ensure robu
 
 ```
 intelligent-sales-assistant/
-├── IntelligentSalesAssistantAPI/              # Core API Service
+├── IntelligentSalesAssistantAPI/             # Core API Service
 │   ├── Controllers/                          # API Controllers
 │   │   ├── AuthController.cs                 # JWT Authentication
 │   │   ├── CompanyResearchController.cs      # BolagsAPI Integration
@@ -429,12 +429,6 @@ intelligent-sales-assistant/
 ## 🤝 Contributing
 
 This is a portfolio project demonstrating microservices architecture and AI integration. Feedback and suggestions are welcome!
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 

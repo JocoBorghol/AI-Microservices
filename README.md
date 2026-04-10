@@ -120,7 +120,7 @@ Service communication is optimized for performance:
 | **Resilience** | Polly (Retry, Circuit Breaker, Timeout) |
 | **Authentication** | JWT Bearer Tokens |
 | **API Documentation** | Scalar (OpenAPI 3.0) |
-| **AI Provider** | Google Gemini API (gemini-2.0-flash-exp) |
+| **AI Provider** | Google Gemini API (gemini-3.1-flash-lite-preview) |
 | **External APIs** | BolagsAPI (Swedish Company Registry) |
 
 ---

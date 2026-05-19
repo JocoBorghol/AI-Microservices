@@ -179,5 +179,80 @@ namespace IntelligentSalesAssistantAPI.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Uppdaterar ett specifikt utkast manuellt (Non-Destructive)
+        /// </summary>
+        /// <param name="id">ID för utkastet</param>
+        /// <param name="request">Det nya innehållet</param>
+        /// <returns>Det uppdaterade utkastet med den nya sökvägen</returns>
+        /// <response code="200">Utkastet uppdaterades framgångsrikt</response>
+        /// <response code="400">Ogiltiga parametrar</response>
+        /// <response code="401">Om användaren inte är autentiserad</response>
+        /// <response code="404">Om utkastet inte finns</response>
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(typeof(ContentDraftResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ContentDraftResponse>> UpdateDraft(
+            int id,
+            [FromBody] UpdateContentDraftRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Content))
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Title = "Felaktig begäran",
+                    Detail = "Innehållet kan inte vara tomt",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            try
+            {
+                var result = await _draftService.UpdateDraftAsync(id, request.Content);
+                return Ok(result);
+            }
+            catch (FileNotFoundException ex)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Utkast hittades inte",
+                    Detail = ex.Message,
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+        }
+
+        /// <summary>
+        /// Återställer ett utkast till sitt ursprungliga genererade skick
+        /// </summary>
+        /// <param name="id">ID för utkastet</param>
+        /// <returns>Det återställda utkastet</returns>
+        /// <response code="200">Utkastet återställdes framgångsrikt</response>
+        /// <response code="401">Om användaren inte är autentiserad</response>
+        /// <response code="404">Om utkastet inte finns</response>
+        [HttpPost("{id:int}/restore")]
+        [ProducesResponseType(typeof(ContentDraftResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ContentDraftResponse>> RestoreDraft(int id)
+        {
+            try
+            {
+                var result = await _draftService.RestoreDraftAsync(id);
+                return Ok(result);
+            }
+            catch (FileNotFoundException ex)
+            {
+                return NotFound(new ProblemDetails
+                {
+                    Title = "Utkast hittades inte",
+                    Detail = ex.Message,
+                    Status = StatusCodes.Status404NotFound
+                });
+            }
+        }
     }
 }

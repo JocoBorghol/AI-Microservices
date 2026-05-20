@@ -1,0 +1,10 @@
+To add your own images, place them in this folder and name them exactly:
+- hero.jpg (for the hero/header background)
+- about.jpg (for the about section)
+- service1.jpg (for the first service)
+- service2.jpg (for the second service)
+- service3.jpg (for the third service)
+
+Files must be in .jpg format and larger than 1KB.
+
+The system will automatically detect and use these images when you regenerate the website.

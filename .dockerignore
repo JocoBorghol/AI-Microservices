@@ -1,0 +1,32 @@
+# Ignorera källkodskontroll
+.git/
+.gitignore
+
+# Ignorera kompilerat material och byggfiler (.NET-standard)
+**/bin/
+**/obj/
+
+# Ignorera IDE-specifika filer (Visual Studio / VS Code)
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+# Ignorera lokala SQLite-databaser (Viktigt så du inte pushar med din lokala testdata!)
+**/*.db
+**/*.db-journal
+**/*.db-shm
+**/*.db-wal
+
+# Ignorera Docker-loggar och filer skapade under lokala tester
+.dockerignore
+Dockerfile
+**/Dockerfile
+
+# Ignorera publiceringsmappar om du kört dotnet publish lokalt
+**/publish/
+
+# Ignorera OS-specifika filer
+Thumbs.db
+.DS_Store

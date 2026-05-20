@@ -20,8 +20,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Exponera portar för API:et
+# Tvinga .NET att lyssna på rätt port för rootless containers
+ENV ASPNETCORE_URLS=http://+:8080
+
+# Exponera porten för API:et
 EXPOSE 8080
-EXPOSE 8081
 
 ENTRYPOINT ["dotnet", "IntelligentSalesAssistantAPI.dll"]

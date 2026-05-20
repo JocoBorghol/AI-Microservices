@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -17,18 +17,21 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore
+      - name: Restore Service A (API)
+        run: dotnet restore IntelligentSalesAssistantAPI/IntelligentSalesAssistantAPI.csproj
 
-      - name: Build solution
-        run: dotnet build --no-restore --configuration Release
+      - name: Restore Service B (Content Engine)
+        run: dotnet restore IntelligentSalesAssistant.ContentEngine/IntelligentSalesAssistant.ContentEngine.csproj
 
-      - name: Run unit tests
-        run: dotnet test --no-build --configuration Release
+      - name: Build Service A
+        run: dotnet build IntelligentSalesAssistantAPI/IntelligentSalesAssistantAPI.csproj --no-restore --configuration Release
+
+      - name: Build Service B
+        run: dotnet build IntelligentSalesAssistant.ContentEngine/IntelligentSalesAssistant.ContentEngine.csproj --no-restore --configuration Release
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-test
+    needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

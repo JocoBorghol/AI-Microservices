@@ -2,6 +2,7 @@ using IntelligentSalesAssistantAPI.DTOs;
 using IntelligentSalesAssistantAPI.Services.ContentDraft;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ISA.ContentEngine.Security;
 
 namespace IntelligentSalesAssistantAPI.Controllers
 {

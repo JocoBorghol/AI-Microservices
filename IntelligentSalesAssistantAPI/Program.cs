@@ -193,17 +193,20 @@ var app = builder.Build();
 app.UseMiddleware<CustomExceptionMiddleware>();
 
 
-// 2. Utvecklingsverktyg: Scalar UI aktiveras i utvecklingsläge
-if (app.Environment.IsDevelopment())
+// 2. Utvecklingsverktyg och testmiljö: Scalar UI aktiveras för både lokal- och produktionsmiljö
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger(); // Genererar openapi.json
-    app.MapScalarApiReference(options => 
+    app.MapScalarApiReference(options =>
     {
         options.WithOpenApiRoutePattern("/swagger/v1/swagger.json");
     });
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 // Servera genererade hemsidor som statiska filer
 var projectRoot = Directory.GetCurrentDirectory(); // Redan i IntelligentSalesAssistantAPI-mappen

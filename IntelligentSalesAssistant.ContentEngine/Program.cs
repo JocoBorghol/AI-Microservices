@@ -32,7 +32,7 @@ builder.Services.AddHttpClient<IGeminiClient, GeminiClient>(client =>
     };
     // Circuit breaker sampling duration måste vara minst dubbelt så lång som attempt timeout
     options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(80); // 40s * 2 = 80s
-    
+
     // Retry configuration för Gemini API
     options.Retry.MaxRetryAttempts = 3;
     options.Retry.Delay = TimeSpan.FromSeconds(3);
@@ -44,16 +44,21 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseMiddleware<CustomExceptionMiddleware>();
 
-if (app.Environment.IsDevelopment())
+// Justerad för att använda .NET 9 OpenAPI istället för SwaggerGen
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference(options => 
+    app.MapScalarApiReference(options =>
     {
         options.WithOpenApiRoutePattern("/openapi/v1.json");
     });
 }
 
-app.UseHttpsRedirection();
+// Justerad för att förhindra oändliga HTTPS-loopar i Azure Container Apps
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 app.MapControllers();

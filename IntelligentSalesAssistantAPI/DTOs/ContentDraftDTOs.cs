@@ -55,7 +55,13 @@ namespace IntelligentSalesAssistantAPI.DTOs
         string? CompanyName,
         
         /// <example>2026-04-09T08:00:00Z</example>
-        DateTime CreatedAt
+        DateTime CreatedAt,
+
+        /// <example>kandyz-ab/facebook_post-2026-04-09-080000-original.txt</example>
+        string OriginalContentPath,
+
+        /// <example>kandyz-ab/facebook_post-2026-04-09-080000-modified.txt</example>
+        string? ModifiedContentPath
     );
 
     /// <summary>
@@ -91,6 +97,20 @@ namespace IntelligentSalesAssistantAPI.DTOs
         DateTime CreatedAt,
         
         /// <example>1024</example>
-        long FileSizeBytes
+        long FileSizeBytes,
+
+        /// <example>kandyz-ab/facebook_post-2026-04-09-080000-original.txt</example>
+        string OriginalContentPath,
+
+        /// <example>kandyz-ab/facebook_post-2026-04-09-080000-modified.txt</example>
+        string? ModifiedContentPath
+    );
+
+    /// <summary>
+    /// Request för att uppdatera ett innehållsutkast manuellt
+    /// </summary>
+    public record UpdateContentDraftRequest(
+        [Required(ErrorMessage = "Content är obligatoriskt")]
+        string Content
     );
 }

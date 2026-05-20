@@ -61,7 +61,47 @@ namespace IntelligentSalesAssistantAPI.Middleware
             {
                 // Microservice-kommunikationsfel (Service B är nere eller kan inte nås)
                 _logger.LogError(ex, "Microservice communication failure: {Message}", ex.Message);
-                await HandleMicroserviceFailureAsync(context, ex);
+                
+                if (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized || 
+                    ex.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    await WriteProblemDetails(
+                        context, 
+                        StatusCodes.Status502BadGateway, 
+                        "AI-tjänstautentisering misslyckades", 
+                        "Autentiseringen mot AI-tjänsten misslyckades. Kontrollera systemets konfiguration.");
+                }
+                else if (ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                {
+                    await WriteProblemDetails(
+                        context, 
+                        StatusCodes.Status429TooManyRequests, 
+                        "AI-tjänsten är överbelastad", 
+                        "AI-tjänsten är för närvarande överbelastad. Vänligen försök igen om en stund.");
+                }
+                else
+                {
+                    await HandleMicroserviceFailureAsync(context, ex);
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                // Fångar upp TaskCanceledException vid timeout mot externa anrop
+                _logger.LogError(ex, "The request to the AI Service timed out.");
+                await WriteProblemDetails(
+                    context, 
+                    StatusCodes.Status504GatewayTimeout, 
+                    "Timeout i gateway", 
+                    "Anropet till AI-tjänsten tog för lång tid och avbröts.");
+            }
+            catch (TimeoutException ex)
+            {
+                _logger.LogError(ex, "The request to the AI Service timed out.");
+                await WriteProblemDetails(
+                    context, 
+                    StatusCodes.Status504GatewayTimeout, 
+                    "Timeout i gateway", 
+                    "Anropet till AI-tjänsten tog för lång tid och avbröts.");
             }
             catch (Exception ex) when (ex.InnerException is SocketException)
             {

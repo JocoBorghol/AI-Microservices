@@ -41,5 +41,7 @@ namespace IntelligentSalesAssistantAPI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         
         public DateTime? UpdatedAt { get; set; }
+
+        public ICollection<ContentDraft> ContentDrafts { get; set; } = new List<ContentDraft>();
     }
 }

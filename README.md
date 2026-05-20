@@ -1,4 +1,4 @@
-﻿# Intelligent Sales Assistant Platform
+# Intelligent Sales Assistant Platform
 
 > A distributed microservices platform for AI-powered website generation and sales content creation
 
@@ -343,6 +343,38 @@ The platform implements a centralized Custom Exception Middleware to ensure robu
 - Input validation with Data Annotations
 - SQL injection prevention via Entity Framework Core
 - Rate limiting (10 requests/minute per endpoint)
+
+### Så här sätter du API-nyckeln lokalt (User Secrets)
+Under lokal utveckling lagras alla känsliga nycklar utanför projektmappen med hjälp av .NET User Secrets för att förhindra att de oavsiktligt checkas in i Git.
+1. Gå till API-projektets katalog:
+   ```bash
+   cd IntelligentSalesAssistantAPI
+   ```
+2. Sätt API-nyckeln för kommunikation med Service B (Content Engine):
+   ```bash
+   dotnet user-secrets set "LlmProxySettings:ApiKey" "din_lokala_hemliga_nyckel"
+   ```
+Denna nyckel läses automatiskt in i `IConfiguration` under utveckling via det unika `UserSecretsId` i `.csproj`.
+
+### Så här sätter du API-nyckeln i produktion (Environment Variables)
+När systemet körs i produktion i **Azure Container Apps (ACA)**:
+- Applikationen läser automatiskt inställningar från miljövariabler (Environment Variables), där t.ex. `LlmProxySettings__ApiKey` mappar mot `LlmProxySettings:ApiKey` i konfigurationen.
+- **Best Practice**: Nycklar lagras säkert i **Azure Key Vault** och binds till miljövariabler i Azure Container Apps med hjälp av en systemtilldelad **Managed Identity** (hanterad identitet), vilket gör att applikationen aldrig hanterar råa lösenord eller nyckelfiler i kod eller driftsättningsskript.
+
+### CI/CD via GitHub Actions
+Pipelinen (.github/workflows/deploy.yml) bygger, testar och driftsätter båda mikrotjänsterna automatiskt vid varje push till `main`-branchen. För att detta ska fungera behöver du:
+1. Skapa en Service Principal i Azure CLI:
+   ```bash
+   az ad-sp create-for-rbac --name "github-actions-deploy" --role contributor --scopes /subscriptions/fdd80a6b-225f-4078-a232-5c3272145e4c/resourceGroups/rg-isa-prod --sdk-auth
+   ```
+2. Kopiera den resulterande JSON-koden.
+3. Gå till ditt GitHub-arkiv: **Settings > Secrets and variables > Actions**.
+4. Skapa en ny secret med namnet `AZURE_CREDENTIALS` och klistra in JSON-koden.
+
+### Skriftlig säkerhetsgaranti
+Härmed intygas och garanteras att:
+- Inga råa API-nycklar eller hemligheter är eller kommer att checkas in i Git-arkivet (all lokal konfiguration sker via User Secrets eller miljöspecifika platshållare).
+- Alla API-klienter och HTTP-handlers (`ApiKeyHandler`, `BolagsApiAuthHandler`) samt vår globala middleware (`CustomExceptionMiddleware`) är manuellt och programmatiskt verifierade att **aldrig** logga känsliga HTTP-headers (t.ex. `Authorization`, `X-Api-Key`) eller råa request-kroppar innehållande användardata och tokens. Endast säkra, anonymiserade felmeddelanden loggas i systemet.
 
 ---
 

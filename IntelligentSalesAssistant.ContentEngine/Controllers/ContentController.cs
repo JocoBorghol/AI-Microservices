@@ -1,6 +1,5 @@
 using ISA.ContentEngine.ApiClients;
 using ISA.ContentEngine.DTOs;
-using ISA.ContentEngine.Security;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Text;

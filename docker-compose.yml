@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: intelligent-sales-assistant-api
+    build:
+      context: .
+      dockerfile: IntelligentSalesAssistantAPI/Dockerfile
+    ports:
+      - "5267:5267"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ServiceAuth__ApiKey=${ServiceAuth__ApiKey}
+    depends_on:
+      - content-engine
+
+  content-engine:
+    container_name: intelligent-sales-assistant-content-engine
+    build:
+      context: .
+      dockerfile: IntelligentSalesAssistant.ContentEngine/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ServiceAuth__ApiKey=${ServiceAuth__ApiKey}

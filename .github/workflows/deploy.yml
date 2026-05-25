@@ -60,19 +60,15 @@ jobs:
           docker push acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }}
 
       - name: Deploy Service A to Azure Container App
-        uses: azure/container-apps-deploy-action@v2
-        with:
-          acrName: acrisastudentcglyfzltde77k
-          containerAppName: ca-intelligent-sales-api
-          resourceGroup: rg-isa-prod
-          imageToDeploy: acrisastudentcglyfzltde77k.azurecr.io/isa-api:${{ github.sha }}
-          dockerfilePath: ''
+        run: |
+          az containerapp update \
+            --name ca-intelligent-sales-api \
+            --resource-group rg-isa-prod \
+            --image acrisastudentcglyfzltde77k.azurecr.io/isa-api:${{ github.sha }}
 
       - name: Deploy Service B to Azure Container App
-        uses: azure/container-apps-deploy-action@v2
-        with:
-          acrName: acrisastudentcglyfzltde77k
-          containerAppName: ca-intelligent-content-engine
-          resourceGroup: rg-isa-prod
-          imageToDeploy: acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }}
-          dockerfilePath: ''
+        run: |
+          az containerapp update \
+            --name ca-intelligent-content-engine \
+            --resource-group rg-isa-prod \
+            --image acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }}

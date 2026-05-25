@@ -96,3 +96,25 @@ resource containerAppServiceB 'Microsoft.App/containerApps@2023-05-01' = {
     }
   }
 }
+
+var acrPullRoleDefinitionId = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ef3-4680-a075-32614d47b0d4')
+
+resource acrPullAssignmentServiceA 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(acr.id, containerAppServiceA.id, acrPullRoleDefinitionId)
+  scope: acr
+  properties: {
+    roleDefinitionId: acrPullRoleDefinitionId
+    principalId: containerAppServiceA.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+resource acrPullAssignmentServiceB 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(acr.id, containerAppServiceB.id, acrPullRoleDefinitionId)
+  scope: acr
+  properties: {
+    roleDefinitionId: acrPullRoleDefinitionId
+    principalId: containerAppServiceB.identity.principalId
+    principalType: 'ServicePrincipal'
+  }
+}

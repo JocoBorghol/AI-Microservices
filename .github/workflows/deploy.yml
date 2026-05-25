@@ -66,6 +66,7 @@ jobs:
           containerAppName: ca-intelligent-sales-api
           resourceGroup: rg-isa-prod
           imageToDeploy: acrisastudentcglyfzltde77k.azurecr.io/isa-api:${{ github.sha }}
+          dockerfilePath: ''
 
       - name: Deploy Service B to Azure Container App
         uses: azure/container-apps-deploy-action@v2
@@ -74,3 +75,4 @@ jobs:
           containerAppName: ca-intelligent-content-engine
           resourceGroup: rg-isa-prod
           imageToDeploy: acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }}
+          dockerfilePath: ''

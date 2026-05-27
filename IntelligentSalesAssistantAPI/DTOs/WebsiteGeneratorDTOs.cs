@@ -22,34 +22,34 @@ namespace IntelligentSalesAssistantAPI.DTOs
     /// Företagsinformation från BolagsAPI
     /// </summary>
     public record BolagInfo(
-        /// <example>5565093902</example>
+        // <example>5565093902</example>
         string OrgNumber,
         
-        /// <example>Kandy'z AB</example>
+        // <example>Kandy'z AB</example>
         string CompanyName,
         
-        /// <example>Storgatan 12</example>
+        // <example>Storgatan 12</example>
         string? Address,
         
-        /// <example>Stockholm</example>
+        // <example>Stockholm</example>
         string? City,
         
-        /// <example>11122</example>
+        // <example>11122</example>
         string? PostCode,
         
-        /// <example>https://kandyz.se</example>
+        // <example>https://kandyz.se</example>
         string? Website,
         
-        /// <example>Anna Andersson</example>
+        // <example>Anna Andersson</example>
         string? ContactPerson,
         
-        /// <example>08-123 45 67</example>
+        // <example>08-123 45 67</example>
         string? Phone,
         
-        /// <example>info@kandyz.se</example>
+        // <example>info@kandyz.se</example>
         string? Email,
         
-        /// <example>Detaljhandel med godis</example>
+        // <example>Detaljhandel med godis</example>
         string? Industry
     );
 
@@ -74,16 +74,16 @@ namespace IntelligentSalesAssistantAPI.DTOs
     /// Anpassningar för hemsidegenerering (alla fält är valfria)
     /// </summary>
     public record WebsiteCustomization(
-        /// <example>professionell och välkomnande</example>
+        // <example>professionell och välkomnande</example>
         [StringLength(50)] string? Tone = null,
         
-        /// <example>familjer och barnfamiljer</example>
+        // <example>familjer och barnfamiljer</example>
         [StringLength(50)] string? TargetAudience = null,
         
-        /// <example>["Godis", "Choklad", "Presentkort"]</example>
+        // <example>["Godis", "Choklad", "Presentkort"]</example>
         [MaxLength(6)] List<string>? TopServices = null,
         
-        /// <example>["kvalitet", "tradition", "glädje"]</example>
+        // <example>["kvalitet", "tradition", "glädje"]</example>
         [MaxLength(10)] List<string>? Keywords = null
     );
 
@@ -91,7 +91,7 @@ namespace IntelligentSalesAssistantAPI.DTOs
     /// Request för att uppdatera/regenerera en hemsida
     /// </summary>
     public record UpdateWebsiteRequest(
-        /// <example>5565093902</example>
+        // <example>5565093902</example>
         [Required]
         [RegularExpression(@"^\d{6}-?\d{4}$")]
         string OrgNumber,
@@ -103,31 +103,31 @@ namespace IntelligentSalesAssistantAPI.DTOs
     /// Response med information om en genererad hemsida
     /// </summary>
     public record WebsiteResponse(
-        /// <example>1</example>
+        // <example>1</example>
         int Id,
         
-        /// <example>Kandy'z AB</example>
+        // <example>Kandy'z AB</example>
         string CompanyName,
         
-        /// <example>5565093902</example>
+        // <example>5565093902</example>
         string OrgNumber,
         
-        /// <example>/generated/kandyz-ab/index.html</example>
+        // <example>/generated/kandyz-ab/index.html</example>
         string WebsiteUrl,
         
-        /// <example>Detaljhandel med godis</example>
+        // <example>Detaljhandel med godis</example>
         string Category,
         
-        /// <example>professionell och välkomnande</example>
+        // <example>professionell och välkomnande</example>
         string? Tone,
         
-        /// <example>familjer och barnfamiljer</example>
+        // <example>familjer och barnfamiljer</example>
         string? TargetAudience,
         
-        /// <example>2026-04-09T08:00:00Z</example>
+        // <example>2026-04-09T08:00:00Z</example>
         DateTime CreatedAt,
         
-        /// <example>2026-04-09T10:30:00Z</example>
+        // <example>2026-04-09T10:30:00Z</example>
         DateTime? UpdatedAt
     );
 
@@ -135,7 +135,7 @@ namespace IntelligentSalesAssistantAPI.DTOs
     /// Response med lista av genererade hemsidor
     /// </summary>
     public record WebsiteListResponse(
-        /// <example>10</example>
+        // <example>10</example>
         int TotalCount,
         
         List<WebsiteResponse> Websites

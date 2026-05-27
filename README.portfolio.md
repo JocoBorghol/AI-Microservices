@@ -1,6 +1,6 @@
 # Intelligent Sales Assistant - Portfolio Edition
 
-[Svenska](README.md) | [English](README.en.md) | [Enkel version](README.simple.md) | [Portfolio](README.portfolio.md)
+[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md)
 
 Distributed microservices platform built using **.NET 9** and **C# 12** for automated B2B sales workflows. It integrates Swedish company registry data (BolagsAPI) with Google's Gemini AI to dynamically generate customized websites and sales/marketing content.
 

@@ -1,6 +1,6 @@
 # Intelligent Sales Assistant - Enkel version (Pedagogisk guide)
 
-[Svenska](README.md) | [English](README.en.md) | [Enkel version](README.simple.md) | [Portfolio](README.portfolio.md)
+[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md)
 
 Välkommen! Den här guiden är skriven för dig som är nyfiken på hur detta system fungerar, men vill slippa den mest komplicerade tekniska jargongen. Vi förklarar hur applikationen fungerar med hjälp av enkla vardagsmetaforer.
 

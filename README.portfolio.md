@@ -2,45 +2,93 @@
 
 [Svenska](README.md) | [English](README.en.md) | [Enkel version](README.simple.md) | [Portfolio](README.portfolio.md)
 
-This project is a high-performance, secure, and cost-optimized microservices platform built using **.NET 9** and **C# 12**. It is designed to automate B2B sales workflows by integrating real-time Swedish company registry data with Google's Gemini AI to dynamically generate customized websites and sales/marketing content.
+Distributed microservices platform built using **.NET 9** and **C# 12** for automated B2B sales workflows. It integrates Swedish company registry data (BolagsAPI) with Google's Gemini AI to dynamically generate customized websites and sales/marketing content.
 
 ---
 
-## 🚀 Key Architectural Concepts & Technologies
+### System Overview
 
-### 1. Microservices Architecture
-The system consists of two independent services communicating over lightweight HTTP APIs:
-* **Service A (Core API - IntelligentSalesAssistantAPI)**: Orchestrates business workflows, manages users/roles via JWT, interacts with SQLite via EF Core, and consumes Service B.
-* **Service B (AI Content Engine - ContentEngine)**: Acts as a dedicated proxy for Google's Gemini LLM API, ensuring isolation of heavy AI workloads.
+```mermaid
+flowchart TD
+    subgraph Local [Local Development]
+        Dev[Developer]
+        Composer[Docker Compose]
+        Secrets[User Secrets]
+        Dev -->|Manages| Composer
+        Composer -->|Orchestrates| API_Local[IntelligentSalesAssistantAPI]
+        Composer -->|Orchestrates| CE_Local[ContentEngine]
+        API_Local -.->|Service-to-Service| CE_Local
+        Secrets -.->|Local Credentials| API_Local
+        Secrets -.->|Local Credentials| CE_Local
+    end
 
-### 2. High-Performance Service-to-Service Communication
-* **Lean Payload Architecture**: Instead of passing heavy generated HTML over the network, Service B returns highly optimized JSON schemas (3-5 KB). HTML construction is handled locally by Service A using pre-loaded templates. This reduces network overhead by **90-95%**.
+    subgraph CI_CD [GitHub Actions]
+        Repo[GitHub Repository]
+        Workflow[deploy.yml]
+        Repo -->|git push dev/main| Workflow
+        Workflow -->|dotnet build & test| Build[Build / Test Runner]
+        Workflow -->|docker build & push| ACR[Azure Container Registry]
+    end
 
-### 3. Production Security & Hardening
-* **Zero Hardcoded Secrets**: Leverages `.NET User Secrets` locally and Azure Key Vault in production.
-* **Service-to-Service Authentication**: Handshake between Service A and Service B is secured programmatically using a custom `DelegatingHandler` (`ApiKeyHandler`) which appends an API key header (`X-Api-Key`) to outgoing requests.
-* **No Secret Logging**: The API handlers and middleware are programmatically verified to prevent logging sensitive headers (e.g. `Authorization`, `X-Api-Key`) or raw request/response bodies.
-* **Robust Resilience**: Built with `Polly` inside `Microsoft.Extensions.Http.Resilience` implementing Retry, Circuit Breaker, and Attempt Timeout.
-* **Rate Limiting**: Protects public endpoints from abuse using fixed-window rate limiting.
+    subgraph Azure [Azure Cloud - rg-isa-prod]
+        subgraph ACA_Env [ACA Environment - env-joco-inventory]
+            ACA_API[ACA: IntelligentSalesAssistantAPI]
+            ACA_CE[ACA: ContentEngine]
+        end
+        KV[Azure Key Vault]
+        MI[Managed Identity]
 
-### 4. Serverless Cloud Deployment & "Scale to Zero"
-* **Azure Container Apps (ACA)**: Both microservices are deployed inside Azure Container Apps in a shared environment (`env-joco-inventory`).
-* **Scale to Zero**: To eliminate idle hosting costs, both container apps are configured with `min-replicas: 0` and `max-replicas: 3`. The containers automatically shut down when inactive and dynamically cold-start when requests arrive, ensuring **100% cost-efficiency**.
-* **Managed Identities**: Clean and secure connection between Azure Container Apps and Azure Container Registry (ACR) using Managed Identities (`acrpull` role) rather than static admin credentials.
+        ACR -->|acrpull| ACA_Env
+        MI -->|Secures Access| ACA_API
+        MI -->|Secures Access| ACA_CE
+        ACA_API -->|Read Secrets| KV
+        ACA_CE -->|Read Secrets| KV
+        ACA_API -->|HTTPS + API Key| ACA_CE
+    end
+
+    Dev -->|git push| Repo
+```
 
 ---
 
-## 🛠️ Technology Stack
-* **Runtime**: .NET 9.0 (C# 12)
-* **Framework**: ASP.NET Core Web API (Minimal APIs & Controllers)
-* **Database**: Entity Framework Core & SQLite
-* **API Specs**: Scalar (OpenAPI 3.0)
+## Technical Architecture & Core Concepts
+
+### Microservices Architecture
+The system consists of two independent services communicating over HTTP:
+* **Service A (IntelligentSalesAssistantAPI)**: Core orchestrator, handles business workflows, user authentication (JWT), database operations (EF Core & SQLite), and consumes Service B.
+* **Service B (ContentEngine)**: Dedicated AI content generation proxy interacting directly with the Google Gemini API.
+
+### Lean Payload Design (JSON vs HTML)
+To optimize inter-service communication:
+* Service B executes structured Gemini calls and returns lightweight JSON schemas (3-5 KB).
+* Service A performs local HTML rendering using pre-configured templates.
+* **Result**: Reduces payload sizes by 90-95%, significantly cutting bandwidth costs and network overhead.
+
+### Security Hardening & Best Practices
+* **Zero Hardcoded Secrets**: Uses .NET User Secrets during local development and Azure Key Vault in production.
+* **Service-to-Service Handshake**: Secured via custom `DelegatingHandler` (`ApiKeyHandler`) injecting API keys dynamically into outgoing HTTP headers (`X-Api-Key`).
+* **Safe Logging**: Handlers and custom exception middleware are programmatically verified to prevent logging sensitive headers (e.g. `Authorization`, `X-Api-Key`) or raw request/response bodies.
+* **Resilience Framework**: Implements Polly policies (Retry, Circuit Breaker, Timeout) using `Microsoft.Extensions.Http.Resilience`.
+* **Rate Limiting**: Protects public endpoints from brute-force/abuse via fixed-window rate limiting.
+
+### Deployment & Cloud Scale to Zero
+* **Azure Container Apps (ACA)**: Deployed to a shared container environment (`env-joco-inventory`) inside resource group `rg-isa-prod`.
+* **Scale to Zero**: Cost-optimized using container scaling properties (`min-replicas: 0`, `max-replicas: 3`). Containers automatically scale to 0 instances during periods of inactivity to completely eliminate idle hosting costs.
+* **Secure Registry Integration**: ACR integration uses system-assigned Managed Identity with `acrpull` permissions, avoiding the use of static administrator credentials.
+
+---
+
+## Technical Stack
+* **Framework**: .NET 9.0 (C# 12)
+* **Web Services**: ASP.NET Core Web API (Controllers & Minimal APIs)
+* **Data Access**: Entity Framework Core, SQLite
+* **API Documentation**: Scalar (OpenAPI 3.0)
 * **Resilience**: Polly
 * **AI Provider**: Google Gemini API via typed HttpClient
 
 ---
 
-## 👤 Author & Contact
+## Contact Information
 
 **Joco Borghol**
 * **LinkedIn**: [linkedin.com/in/joco-borghol-777b59386](https://www.linkedin.com/in/joco-borghol-777b59386)

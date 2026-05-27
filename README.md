@@ -10,9 +10,54 @@
 
 ---
 
-## 🚀 Översikt
+### Systemöversikt
 
-Intelligent Sales Assistant Platform är ett produktionsklart mikrotjänstsystem som automatiserar säljflöden genom AI-driven innehållsgenerering. Plattformen hämtar företagsdata i realtid från svenska företagsregister och använder Google Gemini AI för att skapa professionella webbplatser och marknadsföringsmaterial.
+```mermaid
+flowchart TD
+    subgraph Local [Lokal utveckling]
+        Dev[Utvecklare]
+        Composer[Docker Compose]
+        Secrets[User Secrets]
+        Dev -->|Hanterar| Composer
+        Composer -->|Orkestrerar| API_Local[IntelligentSalesAssistantAPI]
+        Composer -->|Orkestrerar| CE_Local[ContentEngine]
+        API_Local -.->|Service-till-Service| CE_Local
+        Secrets -.->|Lokala nycklar| API_Local
+        Secrets -.->|Lokala nycklar| CE_Local
+    end
+
+    subgraph CI_CD [GitHub Actions]
+        Repo[GitHub-arkiv]
+        Workflow[deploy.yml]
+        Repo -->|push dev/main| Workflow
+        Workflow -->|dotnet build & test| Build[Bygg & Test-runner]
+        Workflow -->|docker build & push| ACR[Azure Container Registry]
+    end
+
+    subgraph Azure [Azure Cloud - rg-isa-prod]
+        subgraph ACA_Env [ACA Miljö - env-joco-inventory]
+            ACA_API[ACA: IntelligentSalesAssistantAPI]
+            ACA_CE[ACA: ContentEngine]
+        end
+        KV[Azure Key Vault]
+        MI[Managed Identity]
+
+        ACR -->|acrpull| ACA_Env
+        MI -->|Säkrar åtkomst| ACA_API
+        MI -->|Säkrar åtkomst| ACA_CE
+        ACA_API -->|Läs nycklar| KV
+        ACA_CE -->|Läs nycklar| KV
+        ACA_API -->|HTTPS + API-nyckel| ACA_CE
+    end
+
+    Dev -->|git push| Repo
+```
+
+---
+
+## Översikt
+
+Intelligent Sales Assistant Platform är ett produktionsklart mikrotjänstsystem som automatserar säljflöden genom AI-driven innehållsgenerering. Plattformen hämtar företagsdata i realtid från svenska företagsregister och använder Google Gemini AI för att skapa professionella webbplatser och marknadsföringsmaterial.
 
 **Kärnfunktioner:**
 - Automatiserad företagsresearch via BolagsAPI (Svenska företagsregistret)
@@ -23,7 +68,7 @@ Intelligent Sales Assistant Platform är ett produktionsklart mikrotjänstsystem
 
 ---
 
-## 🏗️ Arkitektur
+## Arkitektur
 
 Plattformen implementerar en **mikrotjänstarkitektur** med två oberoende tjänster som kommunicerar via HTTP:
 
@@ -76,7 +121,7 @@ Plattformen implementerar en **mikrotjänstarkitektur** med två oberoende tjän
 
 ---
 
-## ✨ Kärnfunktioner
+## Kärnfunktioner
 
 ### Automatiserad företagsresearch
 - Hämtar realtidsdata från BolagsAPI (Svenska företagsregistret)
@@ -109,7 +154,7 @@ Kommunikationen mellan tjänsterna är optimerad för hög prestanda:
 
 ---
 
-## 🛠️ Teknikstack
+## Teknikstack
 
 | Kategori | Teknologi |
 |----------|-----------|
@@ -127,7 +172,7 @@ Kommunikationen mellan tjänsterna är optimerad för hög prestanda:
 
 ---
 
-## 📦 Komma igång
+## Komma igång
 
 ### Förutsättningar
 
@@ -141,8 +186,8 @@ Kommunikationen mellan tjänsterna är optimerad för hög prestanda:
 
 1. **Klona arkivet**
    ```bash
-   git clone https://github.com/yourusername/intelligent-sales-assistant.git
-   cd intelligent-sales-assistant
+   git clone https://github.com/JocoBorghol/AI-Microservices.git
+   cd AI-Microservices
    ```
 
 2. **Återställ NuGet-paket**
@@ -209,7 +254,7 @@ docker-compose up -d --build
 
 ---
 
-## 🎯 Snabbguide (Quick Start)
+## Snabbguide (Quick Start)
 
 ### 1. Autentisera dig
 
@@ -276,7 +321,7 @@ curl -X POST http://localhost:5267/api/content/drafts \
 
 ---
 
-## 📚 API-dokumentation
+## API-dokumentation
 
 ### IntelligentSalesAssistantAPI Endpoints
 
@@ -307,7 +352,7 @@ Scalar interaktiv dokumentation finns tillgänglig på `http://localhost:5267/sc
 
 ---
 
-## 🛡️ Exception Middleware (Felhantering)
+## Exception Middleware (Felhantering)
 
 Plattformen implementerar en centraliserad Custom Exception Middleware för robust felhantering och säkerhet. Istället för råa systemstackspår fångar denna middleware upp alla fel och omvandlar dem till standardiserade **RFC 7807 Problem Details**-svar.
 
@@ -335,7 +380,7 @@ Plattformen implementerar en centraliserad Custom Exception Middleware för robu
 
 ---
 
-## 🔒 Säkerhet
+## Säkerhet
 
 ### Autentiseringsflöde
 1. Användaren loggar in via `/api/auth/login` och får en JWT-token
@@ -388,10 +433,10 @@ Härmed intygas och garanteras att:
 
 ---
 
-## 📁 Projektstruktur
+## Projektstruktur
 
 ```
-intelligent-sales-assistant/
+AI-Microservices/
 ├── IntelligentSalesAssistantAPI/             # Huvud-API
 │   ├── Controllers/                          # API-Controllers
 │   │   ├── AuthController.cs                 # JWT-Autentisering
@@ -441,7 +486,7 @@ intelligent-sales-assistant/
 
 ---
 
-## 🧪 Testning
+## Testning
 
 ### Manuell testning med Scalar
 
@@ -468,13 +513,13 @@ intelligent-sales-assistant/
 
 ---
 
-## 🤝 Bidra till projektet
+## Bidra till projektet
 
 Detta är ett portföljprojekt för att demonstrera mikrotjänstarkitektur och AI-integration. Feedback och förbättringsförslag är varmt välkomna!
 
 ---
 
-## 👤 Författare
+## Författare
 
 **Joco Borghol**
 - LinkedIn: [linkedin.com/in/joco-borghol-777b59386](https://www.linkedin.com/in/joco-borghol-777b59386)
@@ -482,7 +527,7 @@ Detta är ett portföljprojekt för att demonstrera mikrotjänstarkitektur och A
 
 ---
 
-## 🙏 Tack till
+## Tack till
 
 - **Google Gemini AI** - AI-genererat innehåll
 - **BolagsAPI** - Företagsdata i realtid

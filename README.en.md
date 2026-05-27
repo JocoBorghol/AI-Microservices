@@ -10,7 +10,52 @@
 
 ---
 
-## 🚀 Overview
+### System Overview
+
+```mermaid
+flowchart TD
+    subgraph Local [Local Development]
+        Dev[Developer]
+        Composer[Docker Compose]
+        Secrets[User Secrets]
+        Dev -->|Manages| Composer
+        Composer -->|Orchestrates| API_Local[IntelligentSalesAssistantAPI]
+        Composer -->|Orchestrates| CE_Local[ContentEngine]
+        API_Local -.->|Service-to-Service| CE_Local
+        Secrets -.->|Local Credentials| API_Local
+        Secrets -.->|Local Credentials| CE_Local
+    end
+
+    subgraph CI_CD [GitHub Actions]
+        Repo[GitHub Repository]
+        Workflow[deploy.yml]
+        Repo -->|git push dev/main| Workflow
+        Workflow -->|dotnet build & test| Build[Build / Test Runner]
+        Workflow -->|docker build & push| ACR[Azure Container Registry]
+    end
+
+    subgraph Azure [Azure Cloud - rg-isa-prod]
+        subgraph ACA_Env [ACA Environment - env-joco-inventory]
+            ACA_API[ACA: IntelligentSalesAssistantAPI]
+            ACA_CE[ACA: ContentEngine]
+        end
+        KV[Azure Key Vault]
+        MI[Managed Identity]
+
+        ACR -->|acrpull| ACA_Env
+        MI -->|Secures Access| ACA_API
+        MI -->|Secures Access| ACA_CE
+        ACA_API -->|Read Secrets| KV
+        ACA_CE -->|Read Secrets| KV
+        ACA_API -->|HTTPS + API Key| ACA_CE
+    end
+
+    Dev -->|git push| Repo
+```
+
+---
+
+## Overview
 
 Intelligent Sales Assistant Platform is a production-ready microservices system that automates sales workflows through AI-powered content generation. The platform fetches real-time company data from Swedish business registries and uses Google's Gemini AI to generate professional websites and marketing materials.
 
@@ -23,7 +68,7 @@ Intelligent Sales Assistant Platform is a production-ready microservices system 
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 The platform implements a **microservices architecture** with two independent services communicating via HTTP:
 
@@ -76,7 +121,7 @@ The platform implements a **microservices architecture** with two independent se
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 ### Automated Company Research
 - Fetches real-time data from BolagsAPI (Swedish Company Registry)
@@ -109,7 +154,7 @@ Service communication is optimized for performance:
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Category | Technology |
 |----------|------------|
@@ -127,7 +172,7 @@ Service communication is optimized for performance:
 
 ---
 
-## 📦 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -141,8 +186,8 @@ Service communication is optimized for performance:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/intelligent-sales-assistant.git
-   cd intelligent-sales-assistant
+   git clone https://github.com/JocoBorghol/AI-Microservices.git
+   cd AI-Microservices
    ```
 
 2. **Restore NuGet packages**
@@ -209,7 +254,7 @@ docker-compose up -d --build
 
 ---
 
-## 🎯 Quick Start Guide
+## Quick Start Guide
 
 ### 1. Authenticate
 
@@ -276,7 +321,7 @@ curl -X POST http://localhost:5267/api/content/drafts \
 
 ---
 
-## 📚 API Documentation
+## API Documentation
 
 ### IntelligentSalesAssistantAPI Endpoints
 
@@ -307,7 +352,7 @@ For detailed API documentation with examples, visit `http://localhost:5267/scala
 
 ---
 
-## 🛡️ Custom Exception Middleware
+## Custom Exception Middleware
 
 The platform implements a centralized Custom Exception Middleware to ensure robust error handling and security. Instead of exposing raw stack traces, the middleware intercepts all exceptions and transforms them into standardized **RFC 7807 Problem Details** responses.
 
@@ -335,7 +380,7 @@ The platform implements a centralized Custom Exception Middleware to ensure robu
 
 ---
 
-## 🔒 Security
+## Security
 
 ### Authentication Flow
 1. User authenticates with `/api/auth/login` and receives a JWT token
@@ -386,10 +431,10 @@ It is hereby certified and guaranteed that:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-intelligent-sales-assistant/
+AI-Microservices/
 ├── IntelligentSalesAssistantAPI/             # Core API Service
 │   ├── Controllers/                          # API Controllers
 │   │   ├── AuthController.cs                 # JWT Authentication
@@ -439,7 +484,7 @@ intelligent-sales-assistant/
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Manual Testing with Scalar
 
@@ -466,13 +511,13 @@ intelligent-sales-assistant/
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is a portfolio project demonstrating microservices architecture and AI integration. Feedback and suggestions are welcome!
 
 ---
 
-## 👤 Author
+## Author
 
 **Joco Borghol**
 - LinkedIn: [linkedin.com/in/joco-borghol-777b59386](https://www.linkedin.com/in/joco-borghol-777b59386)
@@ -480,7 +525,7 @@ This is a portfolio project demonstrating microservices architecture and AI inte
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Google Gemini AI** - AI content generation
 - **BolagsAPI** - Swedish company registry data

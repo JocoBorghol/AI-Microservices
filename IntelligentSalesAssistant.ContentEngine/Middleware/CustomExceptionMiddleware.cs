@@ -25,14 +25,22 @@ namespace ISA.ContentEngine.Middleware
                 _logger.LogWarning(ex, "Externt API-fel: {Message}", ex.Message);
                 int statusCode = ex.StatusCode.HasValue ? (int)ex.StatusCode.Value : StatusCodes.Status502BadGateway;
                 if (statusCode == 429) statusCode = StatusCodes.Status429TooManyRequests;
-                
+
+                // Bestäm titel baserat på statuskod
+                var title = statusCode switch
+                {
+                    401 or 403 => "AI-tjänstens autentisering misslyckades. Kontrollera API-nyckeln.",
+                    429 => "AI-tjänsten är överbelastad. Försök igen om en stund.",
+                    _ => "Externt API-anrop misslyckades."
+                };
+
                 context.Response.ContentType = "application/problem+json";
                 context.Response.StatusCode = statusCode;
 
                 var problemDetails = new ProblemDetails
                 {
                     Status = statusCode,
-                    Title = "Externt API-anrop misslyckades.",
+                    Title = title,
                     Detail = ex.Message,
                     Type = "https://datatracker.ietf.org/doc/html/rfc7807",
                     Instance = context.Request.Path

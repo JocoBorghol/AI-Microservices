@@ -64,7 +64,7 @@ builder.Services.AddHttpClient<LlmProxyClient>(client =>
     client.BaseAddress = new Uri(proxyUrl);
     client.Timeout = TimeSpan.FromSeconds(60); // Optimerad timeout för snabbare felhantering
 })
-// BORTTAGEN: .AddHttpMessageHandler<ApiKeyHandler>() eftersom den saknas/inte behövs för intern trafik
+.AddHttpMessageHandler<ApiKeyHandler>()
 .AddStandardResilienceHandler(options =>
 {
     options.Retry.MaxRetryAttempts = 2;
@@ -156,7 +156,7 @@ builder.Services.AddHybridCache();
 
 // --- 4. HTTP-klienter med Resilience-mönster och delegating handlers (för robusta externa API-anrop) ---
 builder.Services.AddTransient<BolagsApiAuthHandler>();
-// BORTTAGEN: builder.Services.AddTransient<ApiKeyHandler>(); eftersom klassen inte finns i detta projekt
+builder.Services.AddTransient<ApiKeyHandler>();
 
 builder.Services.AddHttpClient("CompanyApiClient", client =>
 {

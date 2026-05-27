@@ -49,34 +49,34 @@ namespace IntelligentSalesAssistantAPI.Services.Enrichment
     );
 
     public record BolagData(
-        /// <example>5565093902</example>
+        // <example>5565093902</example>
         string OrgNumber,
         
-        /// <example>Kandy'z AB</example>
+        // <example>Kandy'z AB</example>
         string CompanyName,
         
-        /// <example>Storgatan 12</example>
+        // <example>Storgatan 12</example>
         string? Address,
         
-        /// <example>Stockholm</example>
+        // <example>Stockholm</example>
         string? City,
         
-        /// <example>11122</example>
+        // <example>11122</example>
         string? PostCode,
         
-        /// <example>https://kandyz.se</example>
+        // <example>https://kandyz.se</example>
         string? Website,
         
-        /// <example>Anna Andersson</example>
+        // <example>Anna Andersson</example>
         string? ContactPerson,
         
-        /// <example>08-123 45 67</example>
+        // <example>08-123 45 67</example>
         string? Phone,
         
-        /// <example>info@kandyz.se</example>
+        // <example>info@kandyz.se</example>
         string? Email,
         
-        /// <example>Detaljhandel med godis</example>
+        // <example>Detaljhandel med godis</example>
         string? Industry
     );
 

@@ -29,6 +29,7 @@ appsettings.Local.json
 # API-nycklar & autentisering
 *api-key*
 *apikey*
+!**/ApiKeyHandler.cs
 *.key
 secret*.json
 credentials.json

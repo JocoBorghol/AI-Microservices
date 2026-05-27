@@ -194,6 +194,12 @@ dotnet run
 ```
 Service starts on `http://localhost:5006`
 
+### Running with Docker Compose (Alternative)
+```bash
+# Build and start both microservices in the background from the root folder
+docker-compose up -d --build
+```
+
 ### Verify Installation
 
 - **IntelligentSalesAssistantAPI:** `http://localhost:5267/scalar/v1`
@@ -357,12 +363,14 @@ Under lokal utveckling lagras alla känsliga nycklar utanför projektmappen med 
 Denna nyckel läses automatiskt in i `IConfiguration` under utveckling via det unika `UserSecretsId` i `.csproj`.
 
 ### Så här sätter du API-nyckeln i produktion (Environment Variables)
-När systemet körs i produktion i **Azure Container Apps (ACA)**:
-- Applikationen läser automatiskt inställningar från miljövariabler (Environment Variables), där t.ex. `LlmProxySettings__ApiKey` mappar mot `LlmProxySettings:ApiKey` i konfigurationen.
-- **Best Practice**: Nycklar lagras säkert i **Azure Key Vault** och binds till miljövariabler i Azure Container Apps med hjälp av en systemtilldelad **Managed Identity** (hanterad identitet), vilket gör att applikationen aldrig hanterar råa lösenord eller nyckelfiler i kod eller driftsättningsskript.
+Applikationen är driftsatt i den delade miljön env-joco-inventory i resursgruppen rg-isa-prod.
+
+Känsliga nycklar binds som miljövariabler, där t.ex. LlmProxySettings__ApiKey mappar mot LlmProxySettings:ApiKey.
+
+Cost Optimization (Scale to Zero): Båda applikationerna är konfigurerade med min-replicas: 0 och max-replicas: 3. Detta innebär att behållarna automatiskt skalar ner till 0 instanser vid inaktivitet för att helt eliminera rullande molnkostnader.
 
 ### CI/CD via GitHub Actions
-Pipelinen (.github/workflows/deploy.yml) bygger, testar och driftsätter båda mikrotjänsterna automatiskt vid varje push till `main`-branchen. För att detta ska fungera behöver du:
+Pipelinen (.github/workflows/deploy.yml) bygger, testar och driftsätter båda mikrotjänsterna automatiskt vid pull requests och push-händelser till dev och main-brancherna. För att detta ska fungera behöver du:
 1. Skapa en Service Principal i Azure CLI:
    ```bash
    az ad-sp create-for-rbac --name "github-actions-deploy" --role contributor --scopes /subscriptions/fdd80a6b-225f-4078-a232-5c3272145e4c/resourceGroups/rg-isa-prod --sdk-auth

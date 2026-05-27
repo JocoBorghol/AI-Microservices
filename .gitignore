@@ -96,3 +96,5 @@ BenchmarkDotNet.Artifacts/
 .obsidian/
 
 !**/RequireApiKeyAttribute.cs
+!**/ApiKeyHandler.cs
+

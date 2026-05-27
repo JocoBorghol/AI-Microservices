@@ -1,6 +1,8 @@
 # Intelligent Sales Assistant Platform
 
-> A distributed microservices platform for AI-powered website generation and sales content creation
+[Svenska](README.md) | [English](README.en.md) | [Enkel version](README.simple.md) | [Portfolio](README.portfolio.md)
+
+> En distribuerad mikrotjänstplattform för AI-baserad generering av webbplatser och säljmaterial
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -8,31 +10,76 @@
 
 ---
 
-## 🚀 Overview
+### Systemöversikt
 
-Intelligent Sales Assistant Platform is a production-ready microservices system that automates sales workflows through AI-powered content generation. The platform fetches real-time company data from Swedish business registries and uses Google's Gemini AI to generate professional websites and marketing materials.
+```mermaid
+flowchart TD
+    subgraph Local [Lokal utveckling]
+        Dev[Utvecklare]
+        Composer[Docker Compose]
+        Secrets[User Secrets]
+        Dev -->|Hanterar| Composer
+        Composer -->|Orkestrerar| API_Local[IntelligentSalesAssistantAPI]
+        Composer -->|Orkestrerar| CE_Local[ContentEngine]
+        API_Local -.->|Service-till-Service| CE_Local
+        Secrets -.->|Lokala nycklar| API_Local
+        Secrets -.->|Lokala nycklar| CE_Local
+    end
 
-**Core Capabilities:**
-- Automated company research via BolagsAPI (Swedish Company Registry)
-- AI-powered website generation with customizable themes
-- Marketing content creation (social media posts, emails, newsletters)
-- RESTful API with comprehensive OpenAPI documentation
-- JWT authentication and role-based access control
+    subgraph CI_CD [GitHub Actions]
+        Repo[GitHub-arkiv]
+        Workflow[deploy.yml]
+        Repo -->|push dev/main| Workflow
+        Workflow -->|dotnet build & test| Build[Bygg & Test-runner]
+        Workflow -->|docker build & push| ACR[Azure Container Registry]
+    end
+
+    subgraph Azure [Azure Cloud - rg-isa-prod]
+        subgraph ACA_Env [ACA Miljö - env-joco-inventory]
+            ACA_API[ACA: IntelligentSalesAssistantAPI]
+            ACA_CE[ACA: ContentEngine]
+        end
+        KV[Azure Key Vault]
+        MI[Managed Identity]
+
+        ACR -->|acrpull| ACA_Env
+        MI -->|Säkrar åtkomst| ACA_API
+        MI -->|Säkrar åtkomst| ACA_CE
+        ACA_API -->|Läs nycklar| KV
+        ACA_CE -->|Läs nycklar| KV
+        ACA_API -->|HTTPS + API-nyckel| ACA_CE
+    end
+
+    Dev -->|git push| Repo
+```
 
 ---
 
-## 🏗️ Architecture
+## Översikt
 
-The platform implements a **microservices architecture** with two independent services communicating via HTTP:
+Intelligent Sales Assistant Platform är ett produktionsklart mikrotjänstsystem som automatserar säljflöden genom AI-driven innehållsgenerering. Plattformen hämtar företagsdata i realtid från svenska företagsregister och använder Google Gemini AI för att skapa professionella webbplatser och marknadsföringsmaterial.
+
+**Kärnfunktioner:**
+- Automatiserad företagsresearch via BolagsAPI (Svenska företagsregistret)
+- AI-driven generering av webbplatser med anpassningsbara teman
+- Skapande av marknadsföringsmaterial (sociala medier, e-post, nyhetsbrev)
+- RESTful API med fullständig OpenAPI-dokumentation
+- JWT-autentisering och rollbaserad behörighetskontroll
+
+---
+
+## Arkitektur
+
+Plattformen implementerar en **mikrotjänstarkitektur** med två oberoende tjänster som kommunicerar via HTTP:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │           IntelligentSalesAssistantAPI (Port 5267)          │
-│                   Core API & Business Logic                 │
+│                 Kärn-API & Affärslogik                      │
 │                                                             │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
-│  │  Company     │  │   Website    │  │   Content    │       │
-│  │  Research    │  │  Generator   │  │    Drafts    │       │
+│  │  Företags-   │  │  Webbplats-  │  │  Innehålls-  │       │
+│  │  research    │  │  generering  │  │   utkast     │       │
 │  └──────────────┘  └──────────────┘  └──────────────┘       │
 │         │                  │                  │             │
 │         └──────────────────┴──────────────────┘             │
@@ -42,11 +89,11 @@ The platform implements a **microservices architecture** with two independent se
 │                   │  (Typed Client) │                       │
 │                   └────────┬────────┘                       │
 └────────────────────────────┼────────────────────────────────┘
-                             │ HTTPS + API Key
-                             │ (Proxy Pattern)
+                             │ HTTPS + API-nyckel
+                             │ (Proxy-mönster)
 ┌────────────────────────────▼────────────────────────────────┐
 │    IntelligentSalesAssistant.ContentEngine (Port 5006)      │
-│                     AI Content Engine                       │
+│                      AI Content Engine                      │
 │                                                             │
 │                   ┌────────────────┐                        │
 │                   │ GeminiClient   │                        │
@@ -61,186 +108,186 @@ The platform implements a **microservices architecture** with two independent se
 ```
 
 ### IntelligentSalesAssistantAPI
-- **Responsibility:** Business logic, data orchestration, user authentication
-- **Technology:** ASP.NET Core Web API, Entity Framework Core, SQLite
-- **Endpoints:** Company research, website generation, content drafts
-- **Security:** JWT authentication with Admin and Seller roles
+- **Ansvarsområde:** Affärslogik, datasamordning, användarautentisering
+- **Teknologi:** ASP.NET Core Web API, Entity Framework Core, SQLite
+- **Endpoints:** Företagsresearch, webbplatsgenerering, innehållsutkast
+- **Säkerhet:** JWT-autentisering med rollerna Admin och Seller
 
 ### IntelligentSalesAssistant.ContentEngine
-- **Responsibility:** AI content generation proxy
-- **Technology:** ASP.NET Core Web API, Google Gemini API integration
-- **Endpoints:** Text generation, structured website content
-- **Security:** API key validation for service-to-service communication
+- **Ansvarsområde:** Proxy för AI-innehållsgenerering
+- **Teknologi:** ASP.NET Core Web API, Google Gemini API-integration
+- **Endpoints:** Textgenerering, strukturerat webbplatsinnehåll
+- **Säkerhet:** API-nyckelvalidering för kommunikation mellan tjänster
 
 ---
 
-## ✨ Key Features
+## Kärnfunktioner
 
-### Automated Company Research
-- Fetches real-time data from BolagsAPI (Swedish Company Registry)
-- Caches research results in-memory for session duration
-- Provides structured company information (name, organization number, address, industry)
+### Automatiserad företagsresearch
+- Hämtar realtidsdata från BolagsAPI (Svenska företagsregistret)
+- Cachas i minnet för den aktuella sessionen
+- Tillhandahåller strukturerad företagsinformation (namn, organisationsnummer, adress, bransch)
 
-### AI-Powered Website Generation
-- Generates complete HTML/CSS/JavaScript websites
-- Customizable tone (professional, friendly, bold) and target audience
-- Responsive design with mobile-first templates
-- Websites saved to `Site/generated/{company-name}/index.html`
+### AI-driven webbplatsgenerering
+- Genererar kompletta HTML/CSS/JavaScript-webbplatser
+- Anpassningsbar ton (professionell, vänlig, djärv) och målgrupp
+- Responsiv design med mobilfokuserade mallar
+- Webbplatser sparas i `Site/generated/{company-name}/index.html`
 
-### Marketing Content Creation
-- Creates social media posts (Facebook, Instagram, LinkedIn)
-- Generates emails, blog posts, and newsletters
-- Content references generated websites for consistent messaging
-- Drafts saved to `Site/drafts/{company-name}/{type}_{timestamp}.txt`
+### Skapande av marknadsföringsmaterial
+- Skapar inlägg för sociala medier (Facebook, Instagram, LinkedIn)
+- Genererar e-postmeddelanden, blogginlägg och nyhetsbrev
+- Innehållet refererar till genererade webbplatser för konsekvent tonalitet
+- Utkast sparas i `Site/drafts/{company-name}/{type}_{timestamp}.txt`
 
-### Lean JSON Architecture
-Service communication is optimized for performance:
-- **IntelligentSalesAssistant.ContentEngine** returns structured JSON (3-5 KB)
-- **IntelligentSalesAssistantAPI** builds HTML locally from templates
-- **Result:** 10-20x smaller payloads compared to transferring complete HTML files
+### Optimerad JSON-arkitektur (Lean Payload)
+Kommunikationen mellan tjänsterna är optimerad för hög prestanda:
+- **IntelligentSalesAssistant.ContentEngine** returnerar strukturerad JSON (3-5 KB)
+- **IntelligentSalesAssistantAPI** bygger HTML lokalt utifrån mallar
+- **Resultat:** 10-20x mindre datamängd över nätverket jämfört med att skicka hela HTML-filer
 
-**Benefits:**
-- Reduced network overhead and faster response times
-- Lower bandwidth costs in cloud deployments
-- Clear separation of concerns (content intelligence vs. presentation)
-- Independent scaling based on actual service load
+**Fördelar:**
+- Minskad nätverksbelastning och snabbare svarstider
+- Lägre bandbreddskostnader i molnet
+- Tydlig ansvarsfördelning (AI-intelligens kontra presentation)
+- Oberoende skalning baserat på faktisk belastning på respektive tjänst
 
 ---
 
-## 🛠️ Technology Stack
+## Teknikstack
 
-| Category | Technology |
-|----------|------------|
-| **Framework** | .NET 9.0 |
-| **Language** | C# 12 |
+| Kategori | Teknologi |
+|----------|-----------|
+| **Ramverk** | .NET 9.0 |
+| **Programspråk** | C# 12 |
 | **API** | ASP.NET Core Web API |
 | **ORM** | Entity Framework Core |
-| **Database** | SQLite |
-| **HTTP Client** | IHttpClientFactory with Typed Clients |
-| **Resilience** | Polly (Retry, Circuit Breaker, Timeout) |
-| **Authentication** | JWT Bearer Tokens |
-| **API Documentation** | Scalar (OpenAPI 3.0) |
-| **AI Provider** | Google Gemini API (gemini-3.1-flash-lite-preview) |
-| **External APIs** | BolagsAPI (Swedish Company Registry) |
+| **Databas** | SQLite |
+| **HTTP-klient** | IHttpClientFactory med Typed Clients |
+| **Resiliens** | Polly (Retry, Circuit Breaker, Timeout) |
+| **Autentisering** | JWT Bearer Tokens |
+| **API-dokumentation** | Scalar (OpenAPI 3.0) |
+| **AI-leverantör** | Google Gemini API (gemini-3.1-flash-lite-preview) |
+| **Externa API:er** | BolagsAPI (Svenska företagsregistret) |
 
 ---
 
-## 📦 Getting Started
+## Komma igång
 
-### Prerequisites
+### Förutsättningar
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) or later
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) eller senare
 - [Git](https://git-scm.com/)
-- API Keys:
-  - [Google Gemini API Key](https://ai.google.dev/)
-  - [BolagsAPI Key](https://bolagsapi.se/)
+- API-nycklar:
+  - [Google Gemini API-nyckel](https://ai.google.dev/)
+  - [BolagsAPI-nyckel](https://bolagsapi.se/)
 
 ### Installation
 
-1. **Clone the repository**
+1. **Klona arkivet**
    ```bash
-   git clone https://github.com/yourusername/intelligent-sales-assistant.git
-   cd intelligent-sales-assistant
+   git clone https://github.com/JocoBorghol/AI-Microservices.git
+   cd AI-Microservices
    ```
 
-2. **Restore NuGet packages**
+2. **Återställ NuGet-paket**
    ```bash
    dotnet restore
    ```
-   This ensures all dependencies are downloaded locally before configuration.
+   Detta säkerställer att alla beroenden laddas ner lokalt före konfigurationen.
 
-3. **Configure User Secrets for IntelligentSalesAssistantAPI**
+3. **Konfigurera User Secrets för IntelligentSalesAssistantAPI**
    ```bash
    cd IntelligentSalesAssistantAPI
    dotnet user-secrets init
-   dotnet user-secrets set "Jwt:Key" "your-super-secret-jwt-key-min-32-characters"
-   dotnet user-secrets set "AdminPassword" "your-admin-password"
-   dotnet user-secrets set "SellerPassword" "your-seller-password"
-   dotnet user-secrets set "BolagsApi:ApiKey" "your-bolagsapi-key"
-   dotnet user-secrets set "LlmProxySettings:ApiKey" "your-service-b-api-key"
+   dotnet user-secrets set "Jwt:Key" "din-superhemliga-jwt-nyckel-minst-32-tecken"
+   dotnet user-secrets set "AdminPassword" "ditt-admin-lösenord"
+   dotnet user-secrets set "SellerPassword" "ditt-säljar-lösenord"
+   dotnet user-secrets set "BolagsApi:ApiKey" "din-bolagsapi-nyckel"
+   dotnet user-secrets set "LlmProxySettings:ApiKey" "din-interna-api-nyckel-för-service-b"
    ```
 
-4. **Configure User Secrets for IntelligentSalesAssistant.ContentEngine**
+4. **Konfigurera User Secrets för IntelligentSalesAssistant.ContentEngine**
    ```bash
    cd ../IntelligentSalesAssistant.ContentEngine
    dotnet user-secrets init
-   dotnet user-secrets set "GeminiSettings:ApiKey" "your-gemini-api-key"
-   dotnet user-secrets set "ServiceAuth:ApiKey" "your-service-b-api-key"
+   dotnet user-secrets set "GeminiSettings:ApiKey" "din-gemini-api-nyckel"
+   dotnet user-secrets set "ServiceAuth:ApiKey" "din-interna-api-nyckel-för-service-b"
    ```
    
-   > **Note:** The `ServiceAuth:ApiKey` in ContentEngine must match `LlmProxySettings:ApiKey` in IntelligentSalesAssistantAPI
+   > **Obs:** Värdet för `ServiceAuth:ApiKey` i ContentEngine måste matcha `LlmProxySettings:ApiKey` i IntelligentSalesAssistantAPI.
    
-   > **LLM Integration Note:** The `GeminiSettings:ApiKey` is essential for the AI Content Engine to communicate with Google's Gemini API. Without this secret, the platform will not be able to generate content.
+   > **AI-integration:** `GeminiSettings:ApiKey` krävs för att AI Content Engine ska kunna kommunicera med Google Gemini API. Utan denna nyckel kan plattformen inte generera texter.
 
-5. **Apply Database Migrations**
+5. **Tillämpa databasmigreringar**
    ```bash
    cd ../IntelligentSalesAssistantAPI
    dotnet ef database update
    ```
 
-### Running the Services
+### Köra tjänsterna
 
 **Terminal 1 - IntelligentSalesAssistantAPI:**
 ```bash
 cd IntelligentSalesAssistantAPI
 dotnet run
 ```
-Service starts on `http://localhost:5267`
+Tjänsten startar på `http://localhost:5267`
 
 **Terminal 2 - IntelligentSalesAssistant.ContentEngine:**
 ```bash
 cd IntelligentSalesAssistant.ContentEngine
 dotnet run
 ```
-Service starts on `http://localhost:5006`
+Tjänsten startar på `http://localhost:5006`
 
-### Running with Docker Compose (Alternative)
+### Köra via Docker Compose (Alternativ)
 ```bash
-# Build and start both microservices in the background from the root folder
+# Bygg och starta båda mikrotjänsterna i bakgrunden från rotmappen
 docker-compose up -d --build
 ```
 
-### Verify Installation
+### Verifiera installationen
 
 - **IntelligentSalesAssistantAPI:** `http://localhost:5267/scalar/v1`
 - **IntelligentSalesAssistant.ContentEngine:** `http://localhost:5006/scalar/v1`
 
 ---
 
-## 🎯 Quick Start Guide
+## Snabbguide (Quick Start)
 
-### 1. Authenticate
+### 1. Autentisera dig
 
 ```bash
 curl -X POST http://localhost:5267/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",
-    "password": "your-admin-password"
+    "password": "ditt-admin-lösenord"
   }'
 ```
 
-Save the returned JWT token.
+Spara den returnerade JWT-token.
 
-### 2. Research a Company
+### 2. Gör research på ett företag
 
 ```bash
 curl -X POST http://localhost:5267/api/research \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer DIN_JWT_TOKEN" \
   -d '{
     "orgNumber": "5565093902"
   }'
 ```
 
-This fetches company data from BolagsAPI and caches it in-memory.
+Detta hämtar företagsdata från BolagsAPI och sparar det i minnescachen.
 
-### 3. Generate a Website
+### 3. Generera en webbplats
 
 ```bash
 curl -X POST http://localhost:5267/api/websites \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer DIN_JWT_TOKEN" \
   -d '{
     "customization": {
       "tone": "professional and welcoming",
@@ -251,19 +298,19 @@ curl -X POST http://localhost:5267/api/websites \
   }'
 ```
 
-### 4. View the Generated Website
+### 4. Visa den genererade webbplatsen
 
-Open the URL from the response:
+Öppna webbadressen från svaret:
 ```
 http://localhost:5267/generated/kandyz-ab/index.html
 ```
 
-### 5. Create Marketing Content
+### 5. Skapa marknadsföringsmaterial
 
 ```bash
 curl -X POST http://localhost:5267/api/content/drafts \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Authorization: Bearer DIN_JWT_TOKEN" \
   -d '{
     "contentType": "facebook_post",
     "instructions": "Create a fun post about our summer opening hours",
@@ -274,54 +321,54 @@ curl -X POST http://localhost:5267/api/content/drafts \
 
 ---
 
-## 📚 API Documentation
+## API-dokumentation
 
 ### IntelligentSalesAssistantAPI Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/auth/login` | POST | Generate JWT token |
-| `/api/research` | POST | Fetch company data from BolagsAPI |
-| `/api/research/cache` | GET | Retrieve cached company data |
-| `/api/research/cache` | DELETE | Clear cached company data |
-| `/api/websites` | GET | List all generated websites |
-| `/api/websites` | POST | Generate a new website |
-| `/api/websites/{id}` | GET | Get website details |
-| `/api/websites/{id}` | PUT | Regenerate website |
-| `/api/websites/{id}` | DELETE | Delete website |
-| `/api/content/drafts` | POST | Create content draft (requires websiteId) |
-| `/api/content/drafts` | GET | List all drafts |
-| `/api/content/drafts/{id}` | GET | Get draft content |
-| `/api/content/drafts/{id}` | DELETE | Delete draft |
+| Endpoint | Metod | Beskrivning |
+|----------|-------|-------------|
+| `/api/auth/login` | POST | Generera JWT-token |
+| `/api/research` | POST | Hämta företagsdata från BolagsAPI |
+| `/api/research/cache` | GET | Hämta cachad företagsdata |
+| `/api/research/cache` | DELETE | Rensa cachad företagsdata |
+| `/api/websites` | GET | Lista alla genererade webbplatser |
+| `/api/websites` | POST | Generera en ny webbplats |
+| `/api/websites/{id}` | GET | Hämta webbplatsinformation |
+| `/api/websites/{id}` | PUT | Regenerera webbplats |
+| `/api/websites/{id}` | DELETE | Ta bort webbplats |
+| `/api/content/drafts` | POST | Skapa innehållsutkast (kräver websiteId) |
+| `/api/content/drafts` | GET | Lista alla utkast |
+| `/api/content/drafts/{id}` | GET | Hämta specifikt utkast |
+| `/api/content/drafts/{id}` | DELETE | Ta bort utkast |
 
 ### IntelligentSalesAssistant.ContentEngine Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/content/generate` | POST | Generate AI text content |
-| `/api/content/websites` | POST | Generate structured website content |
+| Endpoint | Metod | Beskrivning |
+|----------|-------|-------------|
+| `/api/content/generate` | POST | Generera AI-textinnehåll |
+| `/api/content/websites` | POST | Generera strukturerat webbplatsinnehåll |
 
-For detailed API documentation with examples, visit `http://localhost:5267/scalar/v1` after starting the services.
+Scalar interaktiv dokumentation finns tillgänglig på `http://localhost:5267/scalar/v1` när tjänsterna körs.
 
 ---
 
-## 🛡️ Custom Exception Middleware
+## Exception Middleware (Felhantering)
 
-The platform implements a centralized Custom Exception Middleware to ensure robust error handling and security. Instead of exposing raw stack traces, the middleware intercepts all exceptions and transforms them into standardized **RFC 7807 Problem Details** responses.
+Plattformen implementerar en centraliserad Custom Exception Middleware för robust felhantering och säkerhet. Istället för råa systemstackspår fångar denna middleware upp alla fel och omvandlar dem till standardiserade **RFC 7807 Problem Details**-svar.
 
-**Architecture:** The middleware is registered in the `Program.cs` request pipeline. It utilizes a `try-catch` block that wraps the `next(context)` delegate, ensuring that any exception thrown during the request lifecycle is caught, logged, and mapped to a structured `ProblemDetails` response using the `Microsoft.AspNetCore.Mvc.ProblemDetails` class.
+**Arkitektur:** Middlewareregistreringen sker i `Program.cs`. Den använder en `try-catch`-struktur runt `next(context)`-delegaten vilket säkerställer att alla undantag som uppstår under en request fångas upp, loggas och mappas till ett strukturerat `ProblemDetails`-svar via klassen `Microsoft.AspNetCore.Mvc.ProblemDetails`.
 
-**Key Benefits:**
-- **Security:** Prevents sensitive system information from leaking to the client
-- **Consistency:** Provides a uniform error format across all microservices
-- **Clarity:** Maps specific domain exceptions (e.g., `FileOperationException`, `CompanyNotFoundException`) to appropriate HTTP status codes
+**Viktiga fördelar:**
+- **Säkerhet:** Förhindrar att känslig systeminformation läcks till klienten
+- **Konsekvens:** Ger ett enhetligt felformat för alla mikrotjänster
+- **Tydlighet:** Mappar specifika domänfel (t.ex. `FileOperationException`, `CompanyNotFoundException`) till korrekta HTTP-statuskoder
 
-**How to trigger and verify (Test):**
-1. Authenticate via `/api/auth/login` to get a JWT token
-2. Call `POST /api/research` but provide a malformed or non-existent organization number (e.g., `"000"`)
-3. Observe the response: The API will return a structured JSON object with `title`, `status`, and `detail` fields instead of a generic error page
+**Så här testar och verifierar du:**
+1. Autentisera dig via `/api/auth/login` för att erhålla en JWT-token
+2. Anropa `POST /api/research` med ett ogiltigt eller icke-existerande organisationsnummer (t.ex. `"000"`)
+3. Kontrollera svaret: API:et returnerar ett strukturerat JSON-objekt med fälten `title`, `status` och `detail` istället för en ostrukturerad felsida
 
-**Example Error Response:**
+**Exempel på felsvar:**
 ```json
 {
   "type": "https://tools.ietf.org/html/rfc7231#section-6.5.4",
@@ -333,22 +380,22 @@ The platform implements a centralized Custom Exception Middleware to ensure robu
 
 ---
 
-## �🔒 Security
+## Säkerhet
 
-### Authentication Flow
-1. User authenticates with `/api/auth/login` and receives a JWT token
-2. JWT token included in `Authorization: Bearer {token}` header for subsequent requests
-3. IntelligentSalesAssistantAPI validates JWT token and extracts user identity
-4. IntelligentSalesAssistantAPI adds API key when communicating with ContentEngine
-5. ContentEngine validates API key before processing requests
+### Autentiseringsflöde
+1. Användaren loggar in via `/api/auth/login` och får en JWT-token
+2. JWT-token skickas med i headern `Authorization: Bearer {token}` för efterföljande anrop
+3. IntelligentSalesAssistantAPI validerar JWT-token och utvinner användaridentiteten
+4. IntelligentSalesAssistantAPI bifogar en intern API-nyckel vid anrop till ContentEngine
+5. ContentEngine validerar API-nyckeln innan förfrågan behandlas
 
-### Security Features
-- JWT tokens with 2-hour expiration
-- Role-based access control (Admin and Seller roles)
-- API key validation for service-to-service communication
-- Input validation with Data Annotations
-- SQL injection prevention via Entity Framework Core
-- Rate limiting (10 requests/minute per endpoint)
+### Säkerhetsfunktioner
+- JWT-tokens med 2 timmars giltighetstid
+- Rollbaserad behörighet (Admin och Seller)
+- API-nyckelvalidering för kommunikation mellan mikrotjänster
+- Indatavalidering med Data Annotations
+- SQL-injektionsskydd via Entity Framework Core
+- Rate limiting (10 anrop/minut per endpoint)
 
 ### Så här sätter du API-nyckeln lokalt (User Secrets)
 Under lokal utveckling lagras alla känsliga nycklar utanför projektmappen med hjälp av .NET User Secrets för att förhindra att de oavsiktligt checkas in i Git.
@@ -386,93 +433,93 @@ Härmed intygas och garanteras att:
 
 ---
 
-## 📁 Project Structure
+## Projektstruktur
 
 ```
-intelligent-sales-assistant/
-├── IntelligentSalesAssistantAPI/             # Core API Service
-│   ├── Controllers/                          # API Controllers
-│   │   ├── AuthController.cs                 # JWT Authentication
-│   │   ├── CompanyResearchController.cs      # BolagsAPI Integration
-│   │   ├── WebsiteGeneratorController.cs     # Website Generation
-│   │   └── ContentDraftController.cs         # Content Drafts
-│   ├── Services/                             # Business Logic
-│   │   ├── Enrichment/                       # Company Research
-│   │   ├── WebsiteGenerator/                 # Website Generation
-│   │   └── ContentDraft/                     # Content Drafts
-│   ├── Http/Clients/                         # Typed HTTP Clients
+AI-Microservices/
+├── IntelligentSalesAssistantAPI/             # Huvud-API
+│   ├── Controllers/                          # API-Controllers
+│   │   ├── AuthController.cs                 # JWT-Autentisering
+│   │   ├── CompanyResearchController.cs      # BolagsAPI-integration
+│   │   ├── WebsiteGeneratorController.cs     # Webbplatsgenerering
+│   │   └── ContentDraftController.cs         # Innehållsutkast
+│   ├── Services/                             # Affärslogik
+│   │   ├── Enrichment/                       # Företagsresearch
+│   │   ├── WebsiteGenerator/                 # Webbplatsgenerering
+│   │   └── ContentDraft/                     # Innehållsutkast
+│   ├── Http/Clients/                         # Typed HTTP-klienter
 │   ├── DTOs/                                 # Data Transfer Objects
-│   ├── Data/                                 # Database Context
-│   ├── Models/                               # Entity Models
-│   │   └── CompanyWebsite.cs                 # Website Entity
+│   ├── Data/                                 # Databaskontext
+│   ├── Models/                               # Entitetsmodeller
+│   │   └── CompanyWebsite.cs                 # Webbplatsentitet
 │   ├── Middleware/                           # Custom Middleware
 │   ├── Filters/                              # Action Filters
 │   ├── Exceptions/                           # Custom Exceptions
-│   ├── Migrations/                           # EF Core Migrations
-│   ├── ServiceA.db                           # SQLite Database
-│   └── Program.cs                            # Application Entry Point
+│   ├── Migrations/                           # EF Core-migreringar
+│   ├── ServiceA.db                           # SQLite-databas
+│   └── Program.cs                            # Applikationens startpunkt
 │
-├── IntelligentSalesAssistant.ContentEngine/  # AI Content Engine
-│   ├── Controllers/                          # API Controllers
-│   │   └── ContentController.cs              # AI Content Generation
-│   ├── ApiClients/                           # Gemini Client
-│   │   ├── GeminiClient.cs                   # Gemini API Integration
+├── IntelligentSalesAssistant.ContentEngine/  # AI Content Engine (Service B)
+│   ├── Controllers/                          # API-Controllers
+│   │   └── ContentController.cs              # AI-textgenerering
+│   ├── ApiClients/                           # Gemini-klient
+│   │   ├── GeminiClient.cs                   # Gemini API-integration
 │   │   └── IGeminiClient.cs                  # Interface
-│   ├── Security/                             # API Key Validation
-│   │   └── RequireApiKeyAttribute.cs         # API Key Filter
+│   ├── Security/                             # API-nyckelvalidering
+│   │   └── RequireApiKeyAttribute.cs         # API-nyckelfilter
 │   ├── Middleware/                           # Custom Middleware
 │   ├── DTOs/                                 # Data Transfer Objects
-│   └── Program.cs                            # Application Entry Point
+│   └── Program.cs                            # Applikationens startpunkt
 │
-├── Site/                                     # Generated Content
-│   ├── template/                             # Website Templates
-│   │   └── index.html                        # Base Template
-│   ├── generated/                            # Generated Websites
-│   │   └── {company-name}/                   # Per-company folders
-│   │       └── index.html                    # Generated Website
-│   └── drafts/                               # Content Drafts
-│       └── {company-name}/                   # Per-company folders
-│           └── {type}_{timestamp}.txt        # Draft Files
+├── Site/                                     # Genererat innehåll
+│   ├── template/                             # Webbplatsmallar
+│   │   └── index.html                        # Basmall
+│   ├── generated/                            # Genererade webbplatser
+│   │   └── {company-name}/                   # Företagsspecifika mappar
+│   │       └── index.html                    # Genererad webbsida
+│   └── drafts/                               # Innehållsutkast
+│       └── {company-name}/                   # Företagsspecifika mappar
+│           └── {type}_{timestamp}.txt        # Utkastsfiler
 │
-└── README.md                                 # This file
+└── README.md                                 # Denna fil
 ```
 
 ---
 
-## 🧪 Testing
+## Testning
 
-### Manual Testing with Scalar
+### Manuell testning med Scalar
 
-1. Start both services
-2. Navigate to `http://localhost:5267/scalar/v1`
-3. Click "Authorize" and enter your JWT token
-4. Test endpoints directly from the interactive documentation
+1. Starta båda tjänsterna
+2. Gå till `http://localhost:5267/scalar/v1`
+3. Klicka på "Authorize" och fyll i din JWT-token
+4. Testa endpoints direkt via det interaktiva gränssnittet
 
-### Example Test Flow
+### Exempel på testflöde
 
-**Complete Website Generation:**
-1. POST `/api/auth/login` - Authenticate and get JWT token
-2. POST `/api/research` - Fetch company data (caches in-memory)
-3. POST `/api/websites` - Generate website using cached data
-4. GET `/api/websites` - List all generated websites
-5. Open generated website in browser
+**Komplett generering av hemsida:**
+1. POST `/api/auth/login` - Autentisera och hämta JWT-token
+2. POST `/api/research` - Hämta företagsdata (sparas i cache)
+3. POST `/api/websites` - Generera webbplats baserad på cache
+4. GET `/api/websites` - Lista alla genererade webbplatser
+5. Öppna den genererade webbplatsen i en webbläsare
 
-**Content Draft Creation:**
-1. POST `/api/auth/login` - Authenticate
-2. POST `/api/research` - Fetch company data
-3. POST `/api/websites` - Generate website
-4. POST `/api/content/drafts` - Create content (using websiteId from step 3)
-5. GET `/api/content/drafts/{id}` - View generated content
-
----
-
-## 🤝 Contributing
-
-This is a portfolio project demonstrating microservices architecture and AI integration. Feedback and suggestions are welcome!
+**Skapa innehållsutkast:**
+1. POST `/api/auth/login` - Autentisera
+2. POST `/api/research` - Hämta företagsdata
+3. POST `/api/websites` - Generera webbplats
+4. POST `/api/content/drafts` - Skapa utkast (skicka med websiteId från steg 3)
+5. GET `/api/content/drafts/{id}` - Visa det genererade utkastet
 
 ---
 
-## 👤 Author
+## Bidra till projektet
+
+Detta är ett portföljprojekt för att demonstrera mikrotjänstarkitektur och AI-integration. Feedback och förbättringsförslag är varmt välkomna!
+
+---
+
+## Författare
 
 **Joco Borghol**
 - LinkedIn: [linkedin.com/in/joco-borghol-777b59386](https://www.linkedin.com/in/joco-borghol-777b59386)
@@ -480,19 +527,19 @@ This is a portfolio project demonstrating microservices architecture and AI inte
 
 ---
 
-## 🙏 Acknowledgments
+## Tack till
 
-- **Google Gemini AI** - AI content generation
-- **BolagsAPI** - Swedish company registry data
-- **Scalar** - API documentation
-- **Polly** - Resilience and transient-fault-handling
+- **Google Gemini AI** - AI-genererat innehåll
+- **BolagsAPI** - Företagsdata i realtid
+- **Scalar** - Interaktiv API-dokumentation
+- **Polly** - Resiliens och transientfelhantering
 
 ---
 
 <div align="center">
 
-**Built with .NET 9 and modern microservices architecture**
+**Byggd med .NET 9 och modern mikrotjänstarkitektur**
 
-[⬆ Back to Top](#intelligent-sales-assistant-platform)
+[⬆ Tillbaka till toppen](#intelligent-sales-assistant-platform)
 
 </div>

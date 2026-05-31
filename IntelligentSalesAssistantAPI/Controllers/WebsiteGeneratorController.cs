@@ -631,9 +631,17 @@ namespace IntelligentSalesAssistantAPI.Controllers
 
             // ── Om oss ────────────────────────────────────────────────────────
             if (req.AboutSubtitle is not null)
-                html = ReplaceClassContent(html, "section-subtitle", Enc(req.AboutSubtitle));
+                html = System.Text.RegularExpressions.Regex.Replace(
+                    html,
+                    @"(<section id=""om-oss""[^>]*>[\s\S]*?<h[1-6][^>]*class=""[^""]*section-subtitle[^""]*""[^>]*>).*?(</h[1-6]>)",
+                    $"$1{Enc(req.AboutSubtitle)}$2",
+                    System.Text.RegularExpressions.RegexOptions.Singleline);
             if (req.AboutTitle is not null)
-                html = ReplaceClassContent(html, "section-title", Enc(req.AboutTitle));
+                html = System.Text.RegularExpressions.Regex.Replace(
+                    html,
+                    @"(<section id=""om-oss""[^>]*>[\s\S]*?<h[1-6][^>]*class=""[^""]*section-title[^""]*""[^>]*>).*?(</h[1-6]>)",
+                    $"$1{Enc(req.AboutTitle)}$2",
+                    System.Text.RegularExpressions.RegexOptions.Singleline);
             if (req.AboutCta is not null)
                 html = System.Text.RegularExpressions.Regex.Replace(
                     html,
@@ -829,7 +837,7 @@ namespace IntelligentSalesAssistantAPI.Controllers
         private static string ReplaceClassContent(string html, string cssClass, string newContent)
             => System.Text.RegularExpressions.Regex.Replace(
                 html,
-                $@"(<[a-z][^>]*class=""[^""]*{System.Text.RegularExpressions.Regex.Escape(cssClass)}[^""]*""[^>]*>).*?(</[a-z]+>)",
+                $@"(<[a-zA-Z0-9]+[^>]*class=""[^""]*{System.Text.RegularExpressions.Regex.Escape(cssClass)}[^""]*""[^>]*>).*?(</[a-zA-Z0-9]+>)",
                 $"$1{newContent}$2", System.Text.RegularExpressions.RegexOptions.Singleline);
 
         private static string ReplaceNthTrustItem(string html, int n, string newContent)

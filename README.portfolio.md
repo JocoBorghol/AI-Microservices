@@ -4,7 +4,7 @@
 
 **Live Demo:** [jocoborghol.se](https://jocoborghol.se)
 
-Distributed microservices platform built using **.NET 9** and **C# 12** for automated B2B sales workflows. It integrates Swedish company registry data (BolagsAPI) with Google's Gemini AI to dynamically generate customized websites and sales/marketing content.
+Distributed microservices platform built using **.NET 9** and **C# 12** for automated content workflows. It integrates Swedish company registry data (BolagsAPI) with Google's Gemini AI to dynamically generate customized websites and marketing content.
 
 ---
 

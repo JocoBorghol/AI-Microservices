@@ -5,10 +5,15 @@ services:
       context: .
       dockerfile: IntelligentSalesAssistantAPI/Dockerfile
     ports:
-      - "5267:5267"
+      - "5267:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceAuth__ApiKey=${ServiceAuth__ApiKey}
+      - Jwt__Key=${Jwt__Key}
+      - AdminPassword=${AdminPassword}
+      - SellerPassword=${SellerPassword}
+    volumes:
+      - api_data:/app/Data
     depends_on:
       - content-engine
 
@@ -18,7 +23,10 @@ services:
       context: .
       dockerfile: IntelligentSalesAssistant.ContentEngine/Dockerfile
     ports:
-      - "5000:5000"
+      - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceAuth__ApiKey=${ServiceAuth__ApiKey}
+
+volumes:
+  api_data:

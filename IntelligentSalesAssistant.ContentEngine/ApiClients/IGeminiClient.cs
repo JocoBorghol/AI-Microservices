@@ -2,6 +2,6 @@ namespace ISA.ContentEngine.ApiClients
 {
     public interface IGeminiClient
     {
-        Task<string> GenerateContentAsync(string prompt, CancellationToken ct = default);
+        Task<string> GenerateContentAsync(string systemPrompt, string userPrompt, CancellationToken ct = default);
     }
 }

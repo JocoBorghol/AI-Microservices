@@ -75,16 +75,26 @@ namespace IntelligentSalesAssistantAPI.DTOs
     /// </summary>
     public record WebsiteCustomization(
         // <example>professionell och välkomnande</example>
-        [StringLength(50)] string? Tone = null,
+        [StringLength(200)] string? Tone = null,
         
         // <example>familjer och barnfamiljer</example>
-        [StringLength(50)] string? TargetAudience = null,
+        [StringLength(200)] string? TargetAudience = null,
         
         // <example>["Godis", "Choklad", "Presentkort"]</example>
         [MaxLength(6)] List<string>? TopServices = null,
         
         // <example>["kvalitet", "tradition", "glädje"]</example>
         [MaxLength(10)] List<string>? Keywords = null
+    );
+
+    /// <summary>
+    /// Request för att byta CSS-tema på en befintlig hemsida (utan regenerering)
+    /// </summary>
+    public record ApplyThemeRequest(
+        // <example>ocean</example>
+        [Required]
+        [StringLength(50)]
+        string Theme
     );
 
     /// <summary>
@@ -128,7 +138,13 @@ namespace IntelligentSalesAssistantAPI.DTOs
         DateTime CreatedAt,
         
         // <example>2026-04-09T10:30:00Z</example>
-        DateTime? UpdatedAt
+        DateTime? UpdatedAt,
+        
+        // <example>ocean</example>
+        string Theme = "original",
+        
+        // <example>{}</example>
+        string? GeneratedContentJson = null
     );
 
     /// <summary>
@@ -139,5 +155,63 @@ namespace IntelligentSalesAssistantAPI.DTOs
         int TotalCount,
         
         List<WebsiteResponse> Websites
+    );
+
+    /// <summary>
+    /// Request för att uppdatera kontaktuppgifter direkt i HTML utan regenerering.
+    /// Alla fält är valfria — skicka bara de du vill ändra.
+    /// </summary>
+    public record UpdateContactRequest(
+        string? Phone = null,
+        string? Email = null,
+        string? Address = null,
+        string? FacebookUrl = null,
+        string? InstagramUrl = null
+    );
+
+    /// <summary>
+    /// Request för att uppdatera textinnehåll direkt i HTML utan regenerering.
+    /// Alla fält är valfria — skicka bara de du vill ändra.
+    /// </summary>
+    public record UpdateContentRequest(
+        // Hero-sektion
+        string? HeroTitle = null,
+        string? HeroText = null,
+        string? CtaPrimary = null,
+        string? CtaSecondary = null,
+
+        // Trust band (tre korta förtroendefraser)
+        string? Trust1 = null,
+        string? Trust2 = null,
+        string? Trust3 = null,
+
+        // Om oss
+        string? AboutSubtitle = null,
+        string? AboutTitle = null,
+        string? AboutParagraph1 = null,
+        string? AboutParagraph2 = null,
+        string? AboutParagraph3 = null,
+        string? AboutCta = null,
+        string? OwnerName = null,
+        string? OwnerTitle = null,
+
+        // Tagline (visas i footer och title)
+        string? Tagline = null,
+
+        // Tjänster (titel + beskrivning per tjänst)
+        string? Service1Title = null,
+        string? Service1Description = null,
+        string? Service2Title = null,
+        string? Service2Description = null,
+        string? Service3Title = null,
+        string? Service3Description = null,
+
+        // FAQ (fråga + svar per FAQ)
+        string? Faq1Question = null,
+        string? Faq1Answer = null,
+        string? Faq2Question = null,
+        string? Faq2Answer = null,
+        string? Faq3Question = null,
+        string? Faq3Answer = null
     );
 }

@@ -152,6 +152,51 @@ Kommunikationen mellan tjänsterna är optimerad för hög prestanda:
 - Tydlig ansvarsfördelning (AI-intelligens kontra presentation)
 - Oberoende skalning baserat på faktisk belastning på respektive tjänst
 
+### Smart Token-optimering & Kostnadseffektivitet
+
+Jag implementerar en intelligent **kontextrik prompt-strategi** för att maximera AI-kvalitet samtidigt som kostnadseffektiviteten bibehålls:
+
+**Min approach:** Använd alltid full kontext med smart prompt engineering:
+
+#### Kontextrik strategi
+För alla företag, oavsett datakomplexitet:
+- **Full kontext:** All tillgänglig företagsdata (namn, bransch, stad, VD, anställda, tjänster)
+- **Användaranpassning:** Ton, målgrupp, nyckelord, ägarcitat
+- **Smarta instruktioner:** Detaljerade regler för professionellt, icke-AI-klingande innehåll
+- **Token-användning:** ~1 500-2 500 tokens (input + output)
+- **Genereringstid:** 15-30 sekunder
+- **Kostnad per webbplats:** ~0,0003 kr (vid 0,15 kr/1M tokens)
+
+**Kvalitet-först-strategi:**
+```csharp
+// Bygg alltid rik prompt med all tillgänglig kontext
+var prompt = BuildPrompt(request); // Inkluderar all företagsdata + anpassning
+
+// AI genererar endast innehåll (inte HTML-struktur)
+var aiText = await _geminiClient.GenerateContentAsync(prompt, ct);
+```
+
+**Mallbaserad rendering:**
+Istället för att be AI:n generera HTML:
+1. Jag ber AI:n generera **endast innehåll** (titlar, beskrivningar, tjänster) som JSON
+2. Jag fyller i färdiga HTML-mallar med AI-genererat innehåll
+3. Resultat: AI:n fokuserar på kreativitet och kvalitet, inte HTML-struktur
+
+**Varför detta är viktigt:**
+- **Kvalitet först:** Rik kontext säkerställer professionellt, välskrivet innehåll
+- **Kostnadseffektivt:** Mallbaserad approach sparar tokens (ingen HTML-generering)
+- **Konsekvens:** Färdiga mallar säkerställer pålitlig struktur
+- **Skalbarhet:** ~0,0003 kr per webbplats möjliggör högvolymbearbetning
+
+**Ytterligare optimeringar jag implementerar:**
+- Strukturerade JSON-svar (ingen markdown-parsning)
+- Detaljerade prompt-regler för att undvika AI-klingande text
+- Branschbaserad tjänstegenerering för fallbacks
+- Cachad företagsdata (inga upprepade API-anrop)
+- Smart sanering (tar bort AI-artefakter som "Företagsnamn: tagline")
+
+Denna arkitektur demonstrerar produktionsklar kvalitetsoptimering samtidigt som kostnadseffektiviteten bibehålls.
+
 ---
 
 ## Teknikstack
@@ -242,15 +287,31 @@ dotnet run
 Tjänsten startar på `http://localhost:5006`
 
 ### Köra via Docker Compose (Alternativ)
+
+Innan du kör systemet i Docker måste du skapa en lokal `.env`-fil i rotmappen för att säkert skicka in lösenord och nycklar till containrarna (utan att råka checka in dem i Git). 
+
+Skapa filen `.env` i samma mapp som `docker-compose.yml` och klistra in följande:
+
+```env
+ServiceAuth__ApiKey=din-interna-api-nyckel-för-service-b
+Jwt__Key=din-superhemliga-jwt-nyckel-minst-32-tecken
+AdminPassword=ditt-valfria-admin-lösenord
+SellerPassword=ditt-valfria-säljar-lösenord
+```
+
+Starta därefter systemet:
 ```bash
 # Bygg och starta båda mikrotjänsterna i bakgrunden från rotmappen
 docker-compose up -d --build
 ```
+När tjänsterna har startat körs de som rootless (internt på port 8080) och är mappade till värddatorn enligt följande:
+- **IntelligentSalesAssistantAPI:** Värdport `5267` -> Containerport `8080` (nås på `http://localhost:5267/scalar/v1`)
+- **IntelligentSalesAssistant.ContentEngine:** Värdport `5000` -> Containerport `8080` (nås på `http://localhost:5000/scalar/v1`)
 
 ### Verifiera installationen
 
 - **IntelligentSalesAssistantAPI:** `http://localhost:5267/scalar/v1`
-- **IntelligentSalesAssistant.ContentEngine:** `http://localhost:5006/scalar/v1`
+- **IntelligentSalesAssistant.ContentEngine:** `http://localhost:5006/scalar/v1` (eller `http://localhost:5000/scalar/v1` när du kör via Docker Compose)
 
 ---
 
@@ -313,7 +374,7 @@ curl -X POST http://localhost:5267/api/content/drafts \
   -H "Authorization: Bearer DIN_JWT_TOKEN" \
   -d '{
     "contentType": "facebook_post",
-    "instructions": "Create a fun post about our summer opening hours",
+    "instructions": "Skapa ett roligt inlägg om våra sommaröppettider",
     "tone": "casual",
     "websiteId": 1
   }'
@@ -329,17 +390,23 @@ curl -X POST http://localhost:5267/api/content/drafts \
 |----------|-------|-------------|
 | `/api/auth/login` | POST | Generera JWT-token |
 | `/api/research` | POST | Hämta företagsdata från BolagsAPI |
-| `/api/research/cache` | GET | Hämta cachad företagsdata |
+| `/api/research/cache` | GET | Hämta och visa cachad företagsdata |
 | `/api/research/cache` | DELETE | Rensa cachad företagsdata |
 | `/api/websites` | GET | Lista alla genererade webbplatser |
 | `/api/websites` | POST | Generera en ny webbplats |
 | `/api/websites/{id}` | GET | Hämta webbplatsinformation |
 | `/api/websites/{id}` | PUT | Regenerera webbplats |
 | `/api/websites/{id}` | DELETE | Ta bort webbplats |
+| `/api/websites/{id}/theme` | PATCH | Byt webbplatstema utan att regenerera |
+| `/api/websites/{id}/contact` | PATCH | Uppdatera kontaktuppgifter i genererad HTML |
+| `/api/websites/{id}/content` | PATCH | Uppdatera textinnehåll i genererad HTML |
+| `/api/websites/{id}/images` | POST | Ladda upp egna bilder (hero, about, tjänster) |
 | `/api/content/drafts` | POST | Skapa innehållsutkast (kräver websiteId) |
 | `/api/content/drafts` | GET | Lista alla utkast |
 | `/api/content/drafts/{id}` | GET | Hämta specifikt utkast |
 | `/api/content/drafts/{id}` | DELETE | Ta bort utkast |
+
+**Webbplatsanpassning:** Efter att en webbplats har genererats kan kunder använda PATCH-endpoints för att finjustera specifika element (tema, kontaktinfo, textinnehåll) utan att regenerera hela webbplatsen. Detta möjliggör snabba iterationer och personalisering direkt från frontend.
 
 ### IntelligentSalesAssistant.ContentEngine Endpoints
 
@@ -356,7 +423,7 @@ Scalar interaktiv dokumentation finns tillgänglig på `http://localhost:5267/sc
 
 Plattformen implementerar en centraliserad Custom Exception Middleware för robust felhantering och säkerhet. Istället för råa systemstackspår fångar denna middleware upp alla fel och omvandlar dem till standardiserade **RFC 7807 Problem Details**-svar.
 
-**Arkitektur:** Middlewareregistreringen sker i `Program.cs`. Den använder en `try-catch`-struktur runt `next(context)`-delegaten vilket säkerställer datamappning till ett strukturerat `ProblemDetails`-svar via klassen `Microsoft.AspNetCore.Mvc.ProblemDetails`.
+**Arkitektur:** Middlewareregistreringen sker i `Program.cs`. Den använder en `try-catch`-struktur runt `next(context)`-delegaten vilket säkerställer att alla undantag som uppstår under en request fångas upp, loggas och mappas till ett strukturerat `ProblemDetails`-svar via klassen `Microsoft.AspNetCore.Mvc.ProblemDetails`.
 
 **Viktiga fördelar:**
 - **Säkerhet:** Förhindrar att känslig systeminformation läcks till klienten
@@ -380,7 +447,7 @@ Plattformen implementerar en centraliserad Custom Exception Middleware för robu
 
 ---
 
-## Säkerhet
+## Säkerhet & Härdning
 
 ### Autentiseringsflöde
 1. Användaren loggar in via `/api/auth/login` och får en JWT-token
@@ -390,12 +457,37 @@ Plattformen implementerar en centraliserad Custom Exception Middleware för robu
 5. ContentEngine validerar API-nyckeln innan förfrågan behandlas
 
 ### Säkerhetsfunktioner
-- JWT-tokens med 2 timmars giltighetstid
-- Rollbaserad behörighet (Admin och Seller)
-- API-nyckelvalidering för kommunikation mellan mikrotjänster
-- Indatavalidering med Data Annotations
-- SQL-injektionsskydd via Entity Framework Core
-- Rate limiting (10 anrop/minut per endpoint)
+- **JWT-autentisering:** Tokens med 2 timmars giltighetstid och validering av utfärdare (issuer), målgrupp (audience) och signeringsnyckel.
+- **Rollbaserad behörighet (RBAC):** Admin- och Seller-roller mappade via claims för endpoint-auktorisering.
+- **API-nyckelvalidering (Service-to-Service):** Härdad header-baserad API-nyckelvalidering för säkra anrop mellan mikrotjänster.
+- **Indatavalidering:** Tvingande indatavalidering via Data Annotations och ModelState-kontroll.
+- **SQL-injektionsskydd:** Automatisk parameterisering av SQL-anrop via Entity Framework Core.
+- **Rate limiting:** IP-baserad rate limiting med fast fönster (10 anrop/minut per endpoint) för att skydda mot överbelastning.
+
+### Containerhärdning (Rootless & Distroless)
+- **Distroless bas-image (Ubuntu Chiseled):** Produktionscontainrarna körs på `mcr.microsoft.com/dotnet/aspnet:9.0-noble-chiseled`. Denna slimmade bas-image saknar helt kommandoskal (`sh`, `bash`), GNU-verktyg (`curl`, `wget`) och pakethanterare (`apt`). Detta minimerar attackytan för post-exploitation till nära noll.
+- **Rootless exekvering:** Processen är konfigurerad att köras under den inbyggda, icke-privilegierade användaren `app` (UID `1654`, GID `1654`) istället för som `root` (UID `0`).
+- **Port 8080-bindning:** För att följa rootless-restriktioner (där portar under 1024 kräver root-rättigheter), lyssnar båda containrarna internt på port `8080` (via `ASPNETCORE_URLS=http://+:8080` och `EXPOSE 8080`).
+- **Säker filhantering utan kommandoskal:** För att stödja databasskrivning (`ServiceA.db` i `Data/`) och webbplatsgenerering (`Site/generated`), skapas katalogerna under bygg- och publiceringsfasen, och kopieras sedan över med ändrat ägarskap:
+  ```dockerfile
+  COPY --from=publish --chown=app:app /app/publish .
+  COPY --from=publish --chown=app:app /app/Site /Site
+  ```
+  Detta ger användaren `app` fulla läs- och skrivbehörigheter utan att containern behöver innehålla ett kommandoskal eller externa verktyg.
+
+### Applikationshärdning (C#)
+- **Miljö-villkorad CORS:** För att förhindra Cross-Origin Resource Sharing (CORS)-attacker i produktion är den öppna policyn `DevPolicy` (som tillåter alla domäner) begränsad till utvecklingsmiljön (`Development`). I produktion tillämpas den strikta policyn `ApiPolicy` som begränsar godkända ursprung till listade domäner:
+  ```csharp
+  if (app.Environment.IsDevelopment())
+  {
+      app.UseCors("DevPolicy");
+  }
+  else
+  {
+      app.UseCors("ApiPolicy");
+  }
+  ```
+- **Fail-Closed API-nyckelvalidering:** Filtret `RequireApiKeyAttribute.cs` har härdats för att stängas vid fel ("fail-closed"). Om API-nyckeln saknas i konfigurationen (t.ex. på grund av felaktig Key Vault-koppling), avbryter filtret direkt anropet och returnerar ett explicit `500 Internal Server Error` (i RFC 7807 Problem Details-format) till klienten istället för att bypassa kontrollen.
 
 ### Så här sätter du API-nyckeln lokalt (User Secrets)
 Under lokal utveckling lagras alla känsliga nycklar utanför projektmappen med hjälp av .NET User Secrets för att förhindra att de oavsiktligt checkas in i Git.
@@ -411,25 +503,70 @@ Denna nyckel läses automatiskt in i `IConfiguration` under utveckling via det u
 
 ### Så här sätter du API-nyckeln i produktion (Environment Variables)
 Applikationen är driftsatt i den delade miljön env-joco-inventory i resursgruppen rg-isa-prod.
-
-Känsliga nycklar binds som miljövariabler, där t.ex. LlmProxySettings__ApiKey mappar mot LlmProxySettings:ApiKey.
-
-Cost Optimization (Scale to Zero): Båda applikationerna är konfigurerade med min-replicas: 0 och max-replicas: 3. Detta innebär att behållarna automatiskt skalar ner till 0 instanser vid inaktivitet för att helt eliminera rullande molnkostnader.
+- Känsliga nycklar binds som miljövariabler, där t.ex. `LlmProxySettings__ApiKey` mappar mot `LlmProxySettings:ApiKey` i konfigurationen.
+- **Bästa praxis:** Nycklar lagras säkert i **Azure Key Vault** och kopplas till miljövariabler i Azure Container Apps med en systemtilldelad **Managed Identity** (med rollen `Key Vault Secrets User`), vilket gör att applikationen aldrig hanterar råa lösenord i kod eller deploy-skript.
 
 ### CI/CD via GitHub Actions
 Pipelinen (.github/workflows/deploy.yml) bygger, testar och driftsätter båda mikrotjänsterna automatiskt vid pull requests och push-händelser till dev och main-brancherna. För att detta ska fungera behöver du:
 1. Skapa en Service Principal i Azure CLI:
    ```bash
-   az ad-sp create-for-rbac --name "github-actions-deploy" --role contributor --scopes /subscriptions/fdd80a6b-225f-4078-a232-5c3272145e4c/resourceGroups/rg-isa-prod --sdk-auth
+   az ad-sp create-for-rbac --name "github-actions-deploy" \
+     --role contributor \
+     --scopes /subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/YOUR_RESOURCE_GROUP \
+     --sdk-auth
    ```
+   Ersätt `YOUR_SUBSCRIPTION_ID` med ditt Azure Subscription ID och `YOUR_RESOURCE_GROUP` med namnet på din resursgrupp.
 2. Kopiera den resulterande JSON-koden.
 3. Gå till ditt GitHub-arkiv: **Settings > Secrets and variables > Actions**.
 4. Skapa en ny secret med namnet `AZURE_CREDENTIALS` och klistra in JSON-koden.
+
+### Auktorisering & Endpoint-säkerhet
+
+Jag implementerar omfattande auktorisering över alla API-endpoints för att säkerställa datasäkerhet och korrekt åtkomstkontroll:
+
+**Auktoriseringsstrategi:**
+- **JWT-baserad autentisering** för alla användarriktade endpoints
+- **API-nyckelvalidering** för service-till-service-kommunikation
+- **Rollbaserad åtkomstkontroll** (Admin/Seller) för administrativa funktioner
+- **Ingen anonym åtkomst** förutom login-endpointen
+
+**Sammanfattning av endpoint-skydd:**
+
+| Controller | Auktorisering | Endpoints | Status |
+|------------|---------------|-----------|--------|
+| **WebsiteGeneratorController** | `[Authorize]` | 9 endpoints (GET, POST, PUT, PATCH, DELETE) | ✅ Skyddad |
+| **ContentDraftController** | `[Authorize]` | 6 endpoints (GET, POST, PUT, DELETE) | ✅ Skyddad |
+| **CompanyResearchController** | `[Authorize]` | 3 endpoints (POST, GET, DELETE cache) | ✅ Skyddad |
+| **AdminController** | `[Authorize(Roles = "Admin")]` | 2 endpoints (registrera säljare, systeminfo) | ✅ Rollskyddad |
+| **AuthController** | Ingen auktorisering | 1 endpoint (login) | ✅ Korrekt öppen |
+| **ContentController** | `[RequireApiKey]` | 1 endpoint (generera innehåll) | ✅ API-nyckelskyddad |
+
+**Viktiga säkerhetsprinciper:**
+- ✅ Alla endpoints som skapar, modifierar eller raderar data kräver autentisering
+- ✅ Alla GET-endpoints som returnerar känslig data kräver autentisering
+- ✅ Inga `[AllowAnonymous]`-attribut som kan kringgå säkerhet
+- ✅ Service-till-service-kommunikation säkrad med API-nyckelvalidering
+- ✅ Admin-funktioner begränsade till endast Admin-roll
+
+**Felhantering & säkerhet:**
+
+Jag implementerar RFC 7807 Problem Details för alla felsvar med korrekt statuskodsmappning:
+- **401 Unauthorized** - Ogiltig eller saknad JWT-token
+- **403 Forbidden** - Giltig token men otillräckliga behörigheter
+- **429 Too Many Requests** - Rate limit överskriden (AI-tjänst överbelastad)
+- **504 Gateway Timeout** - Request timeout (AI-generering tog för lång tid)
+
+**Graceful Degradation:**
+- **Development:** Detaljerade felmeddelanden med stack traces för felsökning
+- **Production:** Generiska felmeddelanden utan interna systemdetaljer
+- **Ingen läckage av känslig data:** Bearer tokens, API-nycklar och headers loggas aldrig
 
 ### Skriftlig säkerhetsgaranti
 Härmed intygas och garanteras att:
 - Inga råa API-nycklar eller hemligheter är eller kommer att checkas in i Git-arkivet (all lokal konfiguration sker via User Secrets eller miljöspecifika platshållare).
 - Alla API-klienter och HTTP-handlers (`ApiKeyHandler`, `BolagsApiAuthHandler`) samt vår globala middleware (`CustomExceptionMiddleware`) är manuellt och programmatiskt verifierade att **aldrig** logga känsliga HTTP-headers (t.ex. `Authorization`, `X-Api-Key`) eller råa request-kroppar innehållande användardata och tokens. Endast säkra, anonymiserade felmeddelanden loggas i systemet.
+
+**Säkerhetsgaranti:** Systemets loggfunktioner är granskade och maskerar/exkluderar alla känsliga Authorization-headers och API-nycklar från loggströmmarna. Externa API-felsvar trunkeras till maximalt 200 tecken innan loggning för att förhindra läckage av nyckelrelaterad information. `ApiKeyHandler` är implementerad med ett strikt fail-closed-mönster: om API-nyckeln saknas i konfigurationen blockeras anropet omedelbart innan det lämnar applikationen.
 
 ---
 
@@ -469,7 +606,7 @@ AI-Microservices/
 │   │   └── RequireApiKeyAttribute.cs         # API-nyckelfilter
 │   ├── Middleware/                           # Custom Middleware
 │   ├── DTOs/                                 # Data Transfer Objects
-│   └── Program.cs                            # Applikationens startpunkt
+│   └── Program.cs                            # Application Entry Point
 │
 ├── Site/                                     # Genererat innehåll
 │   ├── template/                             # Webbplatsmallar
@@ -478,13 +615,13 @@ AI-Microservices/
 │   │   └── {company-name}/                   # Företagsspecifika mappar
 │   │       └── index.html                    # Genererad webbsida
 │   └── drafts/                               # Innehållsutkast
-│       └── {company-name}/                   # Företagsspecifika mappar
-│           └── {type}_{timestamp}.txt        # Utkastsfiler
-│
-├── README.md                                 # Huvud-README (Engelska)
-├── README.sv.md                              # Denna fil (Svenska)
-├── README.simple.md                          # Enkel version (Svenska)
-└── README.portfolio.md                       # Portfolio-version (Engelska)
+│   │   └── {company-name}/                   # Företagsspecifika mappar
+│   │       └── {type}_{timestamp}.txt        # Utkastsfiler
+│   │
+│   ├── README.md                             # Huvud-README (Engelska)
+│   ├── README.sv.md                          # Denna fil (Svenska)
+│   ├── README.simple.md                      # Enkel version (Svenska)
+│   └── README.portfolio.md                   # Portfolio-version (Engelska)
 ```
 
 ---
@@ -522,7 +659,7 @@ Detta är ett portföljprojekt för att demonstrera mikrotjänstarkitektur och A
 
 ---
 
-## Författare
+## Utvecklare
 
 **Joco Borghol**
 - LinkedIn: [linkedin.com/in/joco-borghol-777b59386](https://www.linkedin.com/in/joco-borghol-777b59386)

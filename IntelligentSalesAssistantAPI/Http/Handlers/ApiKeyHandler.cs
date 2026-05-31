@@ -17,11 +17,16 @@ namespace IntelligentSalesAssistantAPI.Http.Handlers
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiKey = _configuration["LlmProxySettings:ApiKey"];
-            if (!string.IsNullOrEmpty(apiKey))
+
+            // Fail-Closed: blockera anropet omedelbart om nyckeln saknas i konfigurationen
+            if (string.IsNullOrEmpty(apiKey))
             {
-                request.Headers.Add("X-Api-Key", apiKey);
+                throw new InvalidOperationException(
+                    "Konfigurationsfel: Intern API-nyckel saknas för tjänst-till-tjänst-kommunikation. " +
+                    "Sätt 'LlmProxySettings:ApiKey' via User Secrets (lokalt) eller miljövariabel (produktion).");
             }
 
+            request.Headers.Add("X-Api-Key", apiKey);
             return await base.SendAsync(request, cancellationToken);
         }
     }

@@ -28,6 +28,15 @@ namespace IntelligentSalesAssistantAPI.DTOs
         // <example>kort</example>
         [StringLength(20)] string? Length = null,
         
+        // <example>Joco</example>
+        [StringLength(100)] string? AuthorName = null,
+        
+        // <example>Säljare på Försäkringskassan</example>
+        [StringLength(100)] string? AuthorRole = null,
+        
+        // <example>true</example>
+        bool? UseEmojis = null,  // null = AI bestämmer själv
+        
         // <example>11</example>
         int? WebsiteId = null,  // Använd specifik hemsida via ID
         

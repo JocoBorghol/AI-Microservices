@@ -115,6 +115,30 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                 html = html.Replace("{{PHONE}}", content.Contact.Phone);
                 html = html.Replace("{{EMAIL}}", content.Contact.Email);
 
+                // Adress (valfri — visas bara om den finns)
+                var address = content.Contact.Address ?? "";
+                if (!string.IsNullOrWhiteSpace(address))
+                {
+                    html = html.Replace("{{ADDRESS_ITEM}}", $@"<div class='dc-item'>
+                            <i class='fas fa-map-marker-alt'></i>
+                            <div><strong>Adress </strong><span>{address}</span></div>
+                        </div>");
+                }
+                else
+                {
+                    html = html.Replace("{{ADDRESS_ITEM}}", "");
+                }
+
+                // Sociala medier (valfria — visas bara om URL finns)
+                var facebookUrl = content.Contact.FacebookUrl ?? "";
+                var instagramUrl = content.Contact.InstagramUrl ?? "";
+                html = html.Replace("{{FACEBOOK_LINK}}", !string.IsNullOrWhiteSpace(facebookUrl)
+                    ? $@"<a href=""{facebookUrl}"" target=""_blank"" rel=""noopener"" class=""social-link""><i class=""fab fa-facebook""></i></a>"
+                    : "");
+                html = html.Replace("{{INSTAGRAM_LINK}}", !string.IsNullOrWhiteSpace(instagramUrl)
+                    ? $@"<a href=""{instagramUrl}"" target=""_blank"" rel=""noopener"" class=""social-link""><i class=""fab fa-instagram""></i></a>"
+                    : "");
+
                 // Värderingar (dynamisk HTML)
                 var valuesHtml = new StringBuilder();
                 foreach (var value in content.Values)
@@ -142,14 +166,21 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                 foreach (var service in content.Services)
                 {
                     // Manual image only: Kontrollera om service-bild finns och är större än 1KB
-                    var serviceFileInfo = new FileInfo(Path.Combine(folderPath, $"service{serviceIndex}.jpg"));
+                    var serviceFileInfo1 = new FileInfo(Path.Combine(folderPath, $"service-{serviceIndex}-1.jpg"));
+                    var serviceFileInfo2 = new FileInfo(Path.Combine(folderPath, $"service{serviceIndex}.jpg"));
+                    var serviceExists = (serviceFileInfo1.Exists && serviceFileInfo1.Length > 1000) || 
+                                        (serviceFileInfo2.Exists && serviceFileInfo2.Length > 1000);
                     
-                    if (serviceFileInfo.Exists && serviceFileInfo.Length > 1000)
+                    if (serviceExists)
                     {
+                        var imgUrl = serviceFileInfo1.Exists && serviceFileInfo1.Length > 1000
+                            ? $"images/service-{serviceIndex}-1.jpg"
+                            : $"images/service{serviceIndex}.jpg";
+
                         // Bild finns - rendera med bild
                         servicesHtml.Append($@"
-                        <article class='service-card fade-in'>
-                            <div class='card-image' style=""background-image: url('images/service{serviceIndex}.jpg');""></div>
+                        <article class='service-card fade-in service-card-has-image'>
+                            <img src=""{imgUrl}"" alt=""{service.Title}"" class=""service-img"" style=""cursor: pointer;"" />
                             <div class='card-body'>
                                 <h3>{service.Title}</h3>
                                 <p>{service.Description}</p>
@@ -171,17 +202,21 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                 }
                 html = html.Replace("{{SERVICES}}", servicesHtml.ToString());
 
-                // FAQ (dynamisk HTML)
-                var faqsHtml = new StringBuilder();
+                // FAQ (ersätt individuella placeholders)
+                int faqIndex = 1;
                 foreach (var faq in content.Faqs)
                 {
-                    faqsHtml.Append($@"
-                        <div class='faq-card fade-in'>
-                            <h3><i class='{faq.Icon}'></i> {faq.Question}</h3>
-                            <p>{faq.Answer}</p>
-                        </div>");
+                    html = html.Replace($"{{{{FAQ{faqIndex}_QUESTION}}}}", faq.Question);
+                    html = html.Replace($"{{{{FAQ{faqIndex}_ANSWER}}}}", faq.Answer);
+                    faqIndex++;
                 }
-                html = html.Replace("{{FAQS}}", faqsHtml.ToString());
+
+                // Fallback om det genererats färre än 3 FAQs
+                for (int i = faqIndex; i <= 3; i++)
+                {
+                    html = html.Replace($"{{{{FAQ{i}_QUESTION}}}}", "Fråga?");
+                    html = html.Replace($"{{{{FAQ{i}_ANSWER}}}}", "Svar kommer inom kort.");
+                }
 
                 return Task.FromResult(html);
             }

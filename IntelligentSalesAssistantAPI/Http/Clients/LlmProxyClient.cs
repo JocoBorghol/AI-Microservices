@@ -18,9 +18,9 @@ namespace IntelligentSalesAssistantAPI.Http.Clients
             _httpClient = httpClient;
         }
 
-        public async Task<string> GenerateContentAsync(string prompt, CancellationToken ct, string clientId = "service-a")
+        public async Task<string> GenerateContentAsync(string systemPrompt, string userPrompt, CancellationToken ct, string clientId = "service-a")
         {
-            var requestBody = new { prompt = prompt, clientId = clientId };
+            var requestBody = new { systemPrompt = systemPrompt, userPrompt = userPrompt, clientId = clientId };
             var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("/api/content/generate", content, ct);

@@ -19,39 +19,53 @@ namespace ISA.ContentEngine.ApiClients
             _logger = logger;
         }
 
-        public async Task<string> GenerateContentAsync(string prompt, CancellationToken ct = default)
+        // Den osäkra 1-argumentsmetoden har tagits bort för att tvinga fram separation av system/user prompt.
+
+        public async Task<string> GenerateContentAsync(string systemPrompt, string userPrompt, CancellationToken ct = default)
         {
             var payload = new
             {
+                systemInstruction = new
+                {
+                    parts = new[] { new { text = systemPrompt } }
+                },
                 contents = new[]
                 {
                     new
                     {
-                        parts = new[] { new { text = prompt } }
+                        parts = new[] { new { text = userPrompt } }
                     }
+                },
+                safetySettings = new[]
+                {
+                    new { category = "HARM_CATEGORY_DANGEROUS_CONTENT",   threshold = "BLOCK_LOW_AND_ABOVE" },
+                    new { category = "HARM_CATEGORY_HARASSMENT",          threshold = "BLOCK_MEDIUM_AND_ABOVE" },
+                    new { category = "HARM_CATEGORY_HATE_SPEECH",         threshold = "BLOCK_MEDIUM_AND_ABOVE" },
+                    new { category = "HARM_CATEGORY_SEXUALLY_EXPLICIT",   threshold = "BLOCK_MEDIUM_AND_ABOVE" }
                 }
             };
 
             var jsonPayload = JsonSerializer.Serialize(payload);
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-            // Sätt API-nyckeln som header istället för query-parameter (säkrare)
             using var request = new HttpRequestMessage(HttpMethod.Post, _options.GenerateContentUrl)
             {
                 Content = content
             };
             request.Headers.Add("x-goog-api-key", _options.ApiKey);
 
-            _logger.LogDebug("Skickar request till Gemini: {Url}", _options.GenerateContentUrl);
+            _logger.LogDebug("Skickar request med systemInstruction till Gemini: {Url}", _options.GenerateContentUrl);
 
             var response = await _httpClient.SendAsync(request, ct);
 
             if (!response.IsSuccessStatusCode)
             {
                 var errorBody = await response.Content.ReadAsStringAsync(ct);
-                _logger.LogWarning("Gemini API returnerade {StatusCode}: {ErrorBody}", response.StatusCode, errorBody);
+                // Trunkera felsvaret till max 200 tecken för att förhindra läckage av känslig data från externa API:er
+                var sanitizedError = errorBody.Length > 200 ? errorBody.Substring(0, 200) + "..." : errorBody;
+                _logger.LogWarning("Gemini API returnerade {StatusCode}: {ErrorBody}", response.StatusCode, sanitizedError);
                 throw new HttpRequestException(
-                    $"Gemini API returnerade status {response.StatusCode}. Detaljer: {errorBody}",
+                    $"Gemini API returnerade status {response.StatusCode}. Detaljer: {sanitizedError}",
                     null,
                     response.StatusCode);
             }
@@ -59,7 +73,6 @@ namespace ISA.ContentEngine.ApiClients
             var responseString = await response.Content.ReadAsStringAsync(ct);
             var jsonNode = JsonNode.Parse(responseString);
 
-            // Extrahera text från Googles svar: {"candidates":[{"content":{"parts":[{"text":"..."}]}}]}
             var reply = jsonNode?["candidates"]?[0]?["content"]?["parts"]?[0]?["text"]?.GetValue<string>();
 
             return reply ?? "Kunde inte tolka svaret från Gemini.";

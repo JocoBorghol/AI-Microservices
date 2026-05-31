@@ -18,6 +18,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
             string orgNumber, 
             WebsiteCustomization? customization = null, 
             CompanyEnrichmentData? enrichmentData = null,
+            string? createdBy = null,
             CancellationToken ct = default);
 
         /// <summary>

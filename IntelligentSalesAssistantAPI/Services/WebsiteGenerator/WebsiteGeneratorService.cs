@@ -42,6 +42,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
             string orgNumber,
             WebsiteCustomization? customization = null,
             CompanyEnrichmentData? enrichmentData = null,
+            string? createdBy = null,
             CancellationToken ct = default)
         {
             // Steg 1: Validera organisationsnummer
@@ -139,6 +140,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                 KeywordsJson = customization?.Keywords is not null
                     ? JsonSerializer.Serialize(customization.Keywords)
                     : null,
+                CreatedBy = createdBy ?? "anonymous",
                 GeneratedContentJson = JsonSerializer.Serialize(content),
                 CreatedAt = DateTime.UtcNow
             };
@@ -233,7 +235,9 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                 Tone: website.Tone,
                 TargetAudience: website.TargetAudience,
                 CreatedAt: website.CreatedAt,
-                UpdatedAt: website.UpdatedAt
+                UpdatedAt: website.UpdatedAt,
+                Theme: website.Theme,
+                GeneratedContentJson: website.GeneratedContentJson
             );
     }
 }

@@ -4,7 +4,7 @@
 
 **Live Demo:** [jocoborghol.se](https://jocoborghol.se)
 
-> En distribuerad mikrotjänstplattform för AI-baserad generering av webbplatser och säljmaterial
+> En distribuerad mikrotjänstplattform för AI-baserad generering av webbplatser och skräddarsytt företagsinnehåll
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)

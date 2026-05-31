@@ -4,7 +4,7 @@
 
 **Live Demo:** [jocoborghol.se](https://jocoborghol.se)
 
-> A distributed microservices platform for AI-powered website generation and sales content creation
+> A distributed microservices platform for AI-powered website generation and tailored corporate content
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)

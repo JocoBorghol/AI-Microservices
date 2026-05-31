@@ -13,6 +13,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
         /// <param name="orgNumber">Organisationsnummer</param>
         /// <param name="customization">Valfria anpassningar</param>
         /// <param name="enrichmentData">Valfri enrichment data från /enrichment-preview (används som extra context)</param>
+        /// <param name="createdBy">Vem som skapade hemsidan</param>
         /// <param name="ct">Cancellation token</param>
         Task<WebsiteResponse> GenerateWebsiteAsync(
             string orgNumber, 

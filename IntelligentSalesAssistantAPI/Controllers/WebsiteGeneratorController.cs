@@ -824,13 +824,13 @@ namespace IntelligentSalesAssistantAPI.Controllers
 
         private static string ReplaceTagContent(string html, string tag, string newContent)
             => System.Text.RegularExpressions.Regex.Replace(
-                html, $@"(<{tag}[^>]*>)[^<]*(</\s*{tag}>)", $"$1{newContent}$2");
+                html, $@"(<{tag}[^>]*>).*?(</\s*{tag}>)", $"$1{newContent}$2", System.Text.RegularExpressions.RegexOptions.Singleline);
 
         private static string ReplaceClassContent(string html, string cssClass, string newContent)
             => System.Text.RegularExpressions.Regex.Replace(
                 html,
-                $@"(<[a-z][^>]*class=""[^""]*{System.Text.RegularExpressions.Regex.Escape(cssClass)}[^""]*""[^>]*>)[^<]*(</[a-z]+>)",
-                $"$1{newContent}$2");
+                $@"(<[a-z][^>]*class=""[^""]*{System.Text.RegularExpressions.Regex.Escape(cssClass)}[^""]*""[^>]*>).*?(</[a-z]+>)",
+                $"$1{newContent}$2", System.Text.RegularExpressions.RegexOptions.Singleline);
 
         private static string ReplaceNthTrustItem(string html, int n, string newContent)
         {
@@ -843,7 +843,8 @@ namespace IntelligentSalesAssistantAPI.Controllers
                     // Only replace spans inside trust-band (heuristic: first 3 spans after trust-band)
                     count++;
                     return count == n ? $"{m.Groups[1].Value}{newContent}{m.Groups[3].Value}" : m.Value;
-                });
+                },
+                System.Text.RegularExpressions.RegexOptions.Singleline);
         }
 
         private static string PatchServiceCard(string html, int n, string? title, string? desc, Func<string, string> enc)
@@ -853,7 +854,7 @@ namespace IntelligentSalesAssistantAPI.Controllers
             int count = 0;
             return System.Text.RegularExpressions.Regex.Replace(
                 html,
-                @"(<article class='service-card[^']*'[^>]*>[\s\S]*?<div class='card-body'>[\s\S]*?<h3>)([^<]*)(</h3>)([\s\S]*?<p>)([^<]*)(</p>)([\s\S]*?</article>)",
+                @"(<article class='service-card[^']*'[^>]*>[\s\S]*?<div class='card-body'>[\s\S]*?<h3>)(.*?)(</h3>)([\s\S]*?<p>)(.*?)(</p>)([\s\S]*?</article>)",
                 m =>
                 {
                     count++;
@@ -871,7 +872,7 @@ namespace IntelligentSalesAssistantAPI.Controllers
             int count = 0;
             return System.Text.RegularExpressions.Regex.Replace(
                 html,
-                @"(<div class='faq-card[^']*'[^>]*>[\s\S]*?<h3>[^<]*<\/i>\s*)([^<]*)(</h3>[\s\S]*?<p>)([^<]*)(</p>[\s\S]*?</div>)",
+                @"(<div class='faq-card[^']*'[^>]*>[\s\S]*?<h3>.*?<\/i>\s*)(.*?)(</h3>[\s\S]*?<p>)(.*?)(</p>[\s\S]*?</div>)",
                 m =>
                 {
                     count++;

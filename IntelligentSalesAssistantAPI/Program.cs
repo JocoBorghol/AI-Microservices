@@ -106,7 +106,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ApiPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
+        policy.WithOrigins(
+            "http://localhost:3000", 
+            "https://localhost:3000", 
+            "https://jocoborghol.se", 
+            "https://www.jocoborghol.se", 
+            "https://isa-frontend-three.vercel.app")
               .AllowAnyMethod()
               .AllowAnyHeader();
     });

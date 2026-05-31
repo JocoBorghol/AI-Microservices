@@ -2,6 +2,8 @@
 
 [English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md)
 
+**Live Demo:** [jocoborghol.se](https://jocoborghol.se)
+
 > En distribuerad mikrotjänstplattform för AI-baserad generering av webbplatser och säljmaterial
 
 [![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)

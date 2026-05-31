@@ -22,7 +22,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0-noble-chiseled AS final
 WORKDIR /app
 # Kopiera filer och tilldela ägarskap till app-användaren (UID 1654)
 COPY --from=publish --chown=app:app /app/publish .
-COPY --from=publish --chown=app:app /app/Site /Site
+COPY --from=build --chown=app:app /src/Site /Site
 
 # Tvinga .NET att lyssna på rätt port för rootless containers
 ENV ASPNETCORE_URLS=http://+:8080

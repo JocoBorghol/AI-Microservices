@@ -196,6 +196,15 @@ namespace ISA.ContentEngine.DTOs
         string Phone,
         
         // <example>info@kandyz.se</example>
-        string Email
+        string Email,
+        
+        // <example>Storgatan 12, 123 45 Stockholm</example>
+        string? Address = null,
+        
+        // <example>https://facebook.com/mittforetag</example>
+        string? FacebookUrl = null,
+        
+        // <example>https://instagram.com/mittforetag</example>
+        string? InstagramUrl = null
     );
 }

@@ -6,23 +6,23 @@ namespace IntelligentSalesAssistantAPI.DTOs
     /// Request till Service B för att generera hemsideinnehåll - inkluderar all SuperEnrich-data
     /// </summary>
     public record GenerateWebsiteContentRequest(
-        [Required] string CompanyName,
-        [Required] string Industry,
-        [Required] string City,
-        string? Ceo,
+        [Required][StringLength(100)] string CompanyName,
+        [Required][StringLength(100)] string Industry,
+        [Required][StringLength(100)] string City,
+        [StringLength(100)] string? Ceo,
         int? Employees,
-        string? Founded,
+        [StringLength(50)] string? Founded,
         // Kontaktuppgifter från BolagsAPI
-        string? Phone,
-        string? Email,
-        string? Website,
-        string? Address,
+        [StringLength(50)] string? Phone,
+        [StringLength(100)] string? Email,
+        [StringLength(150)] string? Website,
+        [StringLength(200)] string? Address,
         // Anpassningar från användaren
-        string? Tone,
-        string? TargetAudience,
+        [StringLength(100)] string? Tone,
+        [StringLength(100)] string? TargetAudience,
         List<string>? TopServices,
         List<string>? Keywords,
-        [Required] string ClientId
+        [Required][StringLength(100)] string ClientId
     );
 
     /// <summary>
@@ -86,6 +86,9 @@ namespace IntelligentSalesAssistantAPI.DTOs
     public record WebsiteContactInfo(
         string IntroText,
         string Phone,
-        string Email
+        string Email,
+        string? Address = null,
+        string? FacebookUrl = null,
+        string? InstagramUrl = null
     );
 }

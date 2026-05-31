@@ -19,6 +19,8 @@ using IntelligentSalesAssistantAPI.Services;
 using IntelligentSalesAssistantAPI.Services.Enrichment;
 using IntelligentSalesAssistantAPI.Services.WebsiteGenerator;
 using Scalar.AspNetCore;
+using Microsoft.AspNetCore.Identity;
+using IntelligentSalesAssistantAPI.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -222,7 +224,14 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 
 // 4. CORS: tillåter anrop från frontend
-app.UseCors("DevPolicy");
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("DevPolicy");
+}
+else
+{
+    app.UseCors("ApiPolicy");
+}
 
 // 5. Rate Limiter: skyddar API:et mot överbelastning, placeras direkt efter CORS
 app.UseRateLimiter();
@@ -236,5 +245,57 @@ app.UseAuthorization();
 // 8. Kopplar controllers och aktiverar rate limiting på alla endpoints
 app.MapControllers().RequireRateLimiting("FixedWindow");
 
-// 9. Startar webbservern
+// 9. Automatisk databasmigration och seeding av användare
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    // Kör eventuella utestående databasmigrationer automatiskt vid uppstart
+    context.Database.Migrate();
+
+    // Uppdatera befintliga rader som saknar ägare till "admin"
+    var websitesToFix = context.CompanyWebsites.Where(w => w.CreatedBy == "" || w.CreatedBy == null).ToList();
+    if (websitesToFix.Any())
+    {
+        foreach (var w in websitesToFix)
+        {
+            w.CreatedBy = "admin";
+        }
+        context.SaveChanges();
+    }
+    
+    var hasher = new PasswordHasher<User>();
+    
+    // Seeda Admin-användare om konfiguration finns och användaren saknas
+    var adminPassword = app.Configuration["AdminPassword"];
+    if (!string.IsNullOrEmpty(adminPassword) && !context.Users.Any(u => u.Username == "admin"))
+    {
+        var adminUser = new User
+        {
+            Username = "admin",
+            Role = "Admin",
+            CreatedAt = DateTime.UtcNow
+        };
+        adminUser.PasswordHash = hasher.HashPassword(adminUser, adminPassword);
+        context.Users.Add(adminUser);
+    }
+
+    // Seeda testsäljare (seller1) för bakåtkompatibilitet
+    var sellerPassword = app.Configuration["SellerPassword"];
+    if (!string.IsNullOrEmpty(sellerPassword) && !context.Users.Any(u => u.Username == "seller1"))
+    {
+        var sellerUser = new User
+        {
+            Username = "seller1",
+            Role = "Seller",
+            CreatedAt = DateTime.UtcNow
+        };
+        sellerUser.PasswordHash = hasher.HashPassword(sellerUser, sellerPassword);
+        context.Users.Add(sellerUser);
+    }
+
+    context.SaveChanges();
+}
+
+// 10. Startar webbservern
 app.Run();

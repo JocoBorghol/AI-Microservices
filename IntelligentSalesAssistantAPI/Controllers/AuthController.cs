@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
+using IntelligentSalesAssistantAPI.Data;
+using IntelligentSalesAssistantAPI.Models;
 
 namespace IntelligentSalesAssistantAPI.Controllers
 {
@@ -18,9 +21,12 @@ namespace IntelligentSalesAssistantAPI.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        public AuthController(IConfiguration configuration)
+        private readonly ApplicationDbContext _context;
+
+        public AuthController(IConfiguration configuration, ApplicationDbContext context)
         {
             _configuration = configuration;
+            _context = context;
         }
 
         /// <summary>
@@ -74,32 +80,28 @@ namespace IntelligentSalesAssistantAPI.Controllers
                 throw new IntelligentSalesAssistantAPI.Exceptions.ValidationException("Felaktig inloggningsdata.");
             }
 
-            // Kontrollera användarnamn och lösenord, och bestäm roll samt NameIdentifier för JWT-token
-            string role;
-            string nameIdentifier;
+            // Sök efter användaren i databasen
+            var user = _context.Users.SingleOrDefault(u => u.Username == request.Username);
+            if (user == null)
+            {
+                throw new UnauthorizedException("Felaktigt användarnamn eller lösenord.");
+            }
 
-            if (request.Username == "admin" && request.Password == _configuration["AdminPassword"])
-            {
-                role = "Admin";
-                nameIdentifier = "1";
-            }
-            else if (request.Username == "seller1" && request.Password == _configuration["SellerPassword"])
-            {
-                role = "Seller";
-                nameIdentifier = "2";
-            }
-            else
+            // Verifiera lösenordshash
+            var hasher = new PasswordHasher<User>();
+            var verificationResult = hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+            if (verificationResult == PasswordVerificationResult.Failed)
             {
                 throw new UnauthorizedException("Felaktigt användarnamn eller lösenord.");
             }
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, request.Username),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, request.Username),
-                new Claim(ClaimTypes.NameIdentifier, nameIdentifier),
-                new Claim(ClaimTypes.Role, role)
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var jwtSection = _configuration.GetSection("Jwt");

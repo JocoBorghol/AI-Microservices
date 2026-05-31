@@ -4,8 +4,10 @@ namespace ISA.ContentEngine.DTOs
     /// Request för generering av AI-innehåll
     /// </summary>
     public record ContentRequest(
-        // <example>Skriv en välkomnande text för en godisbutik i Stockholm</example>
-        string Prompt,
+        // <example>Du är en expert på att skriva marknadsföringsinnehåll på svenska...</example>
+        string SystemPrompt,
+        // <example>Skapa ett facebook_post med följande specifikationer...</example>
+        string UserPrompt,
         // <example>ServiceA</example>
         string ClientId
     );

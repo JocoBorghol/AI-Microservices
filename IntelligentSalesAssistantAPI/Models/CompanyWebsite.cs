@@ -35,6 +35,17 @@ namespace IntelligentSalesAssistantAPI.Models
         
         public string? KeywordsJson { get; set; } // JSON-array med nyckelord
         
+        /// <summary>
+        /// CSS-tema som används för hemsidan (t.ex. "ocean", "dark", "forest").
+        /// Bestämmer vilken fil i themes/-mappen som länkas i index.html.
+        /// </summary>
+        [StringLength(50)]
+        public string Theme { get; set; } = "original";
+
+        [Required]
+        [StringLength(100)]
+        public string CreatedBy { get; set; } = "anonymous";
+        
         [Required]
         public string GeneratedContentJson { get; set; } = string.Empty; // Hela WebsiteContentResponse
         

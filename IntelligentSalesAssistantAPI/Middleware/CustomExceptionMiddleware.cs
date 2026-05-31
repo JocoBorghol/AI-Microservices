@@ -34,8 +34,11 @@ namespace IntelligentSalesAssistantAPI.Middleware
             }
             catch (IntelligentSalesAssistantAPI.Exceptions.ValidationException ex)
             {
-                _logger.LogInformation("Validation error: {Message}", ex.Message);
-                await WriteProblemDetails(context, StatusCodes.Status400BadRequest, "Valideringsfel", ex.Message);
+                var detail = ex.Errors != null && ex.Errors.Count > 0 
+                    ? string.Join("; ", ex.Errors) 
+                    : ex.Message;
+                _logger.LogInformation("Validation error: {Message}", detail);
+                await WriteProblemDetails(context, StatusCodes.Status400BadRequest, "Valideringsfel", detail);
             }
             catch (IntelligentSalesAssistantAPI.Exceptions.CompanyNotFoundException ex)
             {
@@ -92,7 +95,7 @@ namespace IntelligentSalesAssistantAPI.Middleware
                     context, 
                     StatusCodes.Status504GatewayTimeout, 
                     "Timeout i gateway", 
-                    "Anropet till AI-tjänsten tog för lång tid och avbröts.");
+                    "Hemsidan tog för lång tid att generera. Detta kan bero på hög belastning. Försök igen om en stund eller kontakta support.");
             }
             catch (TimeoutException ex)
             {
@@ -101,7 +104,7 @@ namespace IntelligentSalesAssistantAPI.Middleware
                     context, 
                     StatusCodes.Status504GatewayTimeout, 
                     "Timeout i gateway", 
-                    "Anropet till AI-tjänsten tog för lång tid och avbröts.");
+                    "Hemsidan tog för lång tid att generera. Detta kan bero på hög belastning. Försök igen om en stund eller kontakta support.");
             }
             catch (Exception ex) when (ex.InnerException is SocketException)
             {

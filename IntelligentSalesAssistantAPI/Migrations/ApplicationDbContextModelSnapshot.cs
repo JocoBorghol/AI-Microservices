@@ -36,6 +36,11 @@ namespace IntelligentSalesAssistantAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("FilePath")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -54,6 +59,11 @@ namespace IntelligentSalesAssistantAPI.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TargetAudience")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Theme")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
@@ -136,6 +146,37 @@ namespace IntelligentSalesAssistantAPI.Migrations
                     b.HasIndex("WebsiteId", "CreatedAt");
 
                     b.ToTable("ContentDrafts");
+                });
+
+            modelBuilder.Entity("IntelligentSalesAssistantAPI.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("IntelligentSalesAssistantAPI.Models.ContentDraft", b =>

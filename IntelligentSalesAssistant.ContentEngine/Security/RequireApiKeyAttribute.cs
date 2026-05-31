@@ -17,9 +17,18 @@ public class RequireApiKeyAttribute : Attribute, IResourceFilter
 
         var expectedApiKey = configuration["ServiceAuth:ApiKey"];
 
-        // Om nyckeln är tom/null: returnera (inaktiverad i dev)
+        // Om nyckeln är tom/null: returnera 500 Internal Server Error för att förhindra bypass
         if (string.IsNullOrEmpty(expectedApiKey))
         {
+            context.Result = new ObjectResult(new ProblemDetails
+            {
+                Status = 500,
+                Title = "Configuration Error",
+                Detail = "API key verification configuration is missing. Access denied for safety."
+            })
+            {
+                StatusCode = 500
+            };
             return;
         }
 

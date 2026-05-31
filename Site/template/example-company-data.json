@@ -1,7 +1,6 @@
 {
   "companyName": "{{COMPANY_NAME}}",
   "tagline": "{{TAGLINE}}",
-  "logoIcon": "{{LOGO_ICON}}",
   "year": "{{YEAR}}",
   
   "hero": {

@@ -1,6 +1,6 @@
 # Intelligent Sales Assistant Platform
 
-[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md)
+[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md) | [Utvärdering & Säkerhet (AI)](evaluation.md)
 
 **Live Demo:** [jocoborghol.se](https://jocoborghol.se)
 
@@ -120,6 +120,11 @@ Plattformen implementerar en **mikrotjänstarkitektur** med två oberoende tjän
 - **Teknologi:** ASP.NET Core Web API, Google Gemini API-integration
 - **Endpoints:** Textgenerering, strukturerat webbplatsinnehåll
 - **Säkerhet:** API-nyckelvalidering för kommunikation mellan tjänster
+
+### Architectural Decision Records (ADRs)
+För detaljerade arkitekturbeslut och systemdesign, se våra ADR:er:
+- [ADR 0001: Molnhosting & Containerhärdning](Docs/ADR/0001-val-av-molnhosting.md) - Beslut kring Azure Container Apps, Key Vault och rootless/distroless-körning.
+- [ADR 0002: Versionshantering av utkast (Non-Destructive Editing)](Docs/ADR/0002-versionshantering-av-utkast.md) - Beslut kring hybrid-lagring (SQLite + disken) och återställningslogik.
 
 ---
 
@@ -450,6 +455,9 @@ Plattformen implementerar en centraliserad Custom Exception Middleware för robu
 ---
 
 ## Säkerhet & Härdning
+
+> [!NOTE]
+> För en detaljerad utvärdering av vår säkerhetsdesign mot Prompt Injection (OWASP LLM01) och våra kvalitetskriterier för AI-generering, se [Rapporten för utvärdering av AI-resultat & Säkerhet](evaluation.md).
 
 ### Autentiseringsflöde
 1. Användaren loggar in via `/api/auth/login` och får en JWT-token

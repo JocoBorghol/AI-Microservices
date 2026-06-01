@@ -1,6 +1,6 @@
 # Intelligent Sales Assistant - Portfolio Edition
 
-[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md)
+[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md) | [AI Evaluation & Security](evaluation.md)
 
 **Live Demo:** [jocoborghol.se](https://jocoborghol.se)
 
@@ -55,6 +55,11 @@ flowchart TD
 
 ## Technical Architecture & Core Concepts
 
+### Architectural Decision Records (ADRs)
+Detailed design and architecture decisions are documented in our ADRs:
+* [ADR 0001: Cloud Hosting & Container Hardening](Docs/ADR/0001-val-av-molnhosting.md) - Azure Container Apps, rootless/distroless execution, and Key Vault integration.
+* [ADR 0002: Content Draft Version Control (Non-Destructive Editing)](Docs/ADR/0002-versionshantering-av-utkast.md) - Hybrid SQLite/file system storage design and rollback mechanics.
+
 ### Microservices Architecture
 The system consists of two independent services communicating over HTTP:
 * **Service A (IntelligentSalesAssistantAPI)**: Core orchestrator, handles business workflows, user authentication (JWT), database operations (EF Core & SQLite), and consumes Service B.
@@ -88,6 +93,7 @@ Instead of asking AI to generate HTML, I request only content (titles, descripti
 * Enables cost-effective scaling for high-volume processing
 
 ### Security Hardening & Best Practices
+* **AI Evaluation & Security Report**: For a comprehensive review of prompt injection mitigation (OWASP LLM01), XML encapsulation, regex blacklisting, and hallucination guardrails, see the [AI Evaluation & Security Report](evaluation.md).
 * **Zero Hardcoded Secrets**: Uses .NET User Secrets during local development and Azure Key Vault in production.
 * **Distroless & Rootless Containers**: The final containers use `mcr.microsoft.com/dotnet/aspnet:9.0-noble-chiseled` (Ubuntu Chiseled) to eliminate shell commands (`sh`/`bash`) and package managers (`apt`). The process runs under the non-privileged `app` user (UID `1654`, GID `1654`) bound to port `8080` internally.
 * **Secure Directory Permissions**: To support SQLite and static file writing, directories (`/Site` and `/app/Data`) are pre-created during publish and copied via `COPY --chown=app:app`, granting write access to the rootless user without needing a system shell.

@@ -1,0 +1,29 @@
+/* ============================================
+   TEMA: MODERN PURPLE (Lila & Magenta)
+   Byt till detta genom att ändra i index.html:
+   <link rel="stylesheet" href="themes/styles-purple.css">
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #6a1b9a;
+    --navy-dark: #4a148c;
+    --forest: #ab47bc;
+    --forest-light: #ce93d8;
+    --white: #ffffff;
+    --light-grey: #f3e5f5;
+    --text-main: #4a148c;
+    --text-muted: #7b1fa2;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(106,27,154,0.1);
+    --transition: 0.3s ease;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #e1bee7; 
+}

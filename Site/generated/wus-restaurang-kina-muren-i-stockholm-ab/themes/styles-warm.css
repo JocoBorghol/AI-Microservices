@@ -1,0 +1,29 @@
+/* ============================================
+   TEMA: VARM (Terrakotta & Guld)
+   Byt till detta genom att ändra i index.html:
+   <link rel="stylesheet" href="themes/styles-warm.css">
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #4a2c2a;
+    --navy-dark: #3a1f1d;
+    --forest: #c0713a;
+    --forest-light: #d4894f;
+    --white: #ffffff;
+    --light-grey: #fdf6f0;
+    --text-main: #3a2420;
+    --text-muted: #7a5f57;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(74,44,42,0.12);
+    --transition: 0.3s ease;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #f9ece0; 
+}

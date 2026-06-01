@@ -1,0 +1,88 @@
+/* ============================================
+   TEMA 3: TERRACOTTA & SAND
+   Känsla: Varm, välkomnande, jordnära lyx
+   Typsnitt: Cormorant Garamond + Jost
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap');
+@import url('../styles.css');
+
+:root {
+    --navy:          #2c1a0e;
+    --navy-dark:     #1a0f08;
+    --forest:        #c0522a;
+    --forest-light:  #d97040;
+    --accent:        #f2c49a;
+    --white:         #fdfaf6;
+    --light-grey:    #f8f1e8;
+    --text-main:     #2c1a0e;
+    --text-muted:    #6b4e38;
+    --sand:          #e8dcc8;
+    --border-radius: 6px;
+    --radius-lg:     16px;
+    --shadow:        0 4px 20px rgba(44,26,14,.08);
+    --shadow-lg:     0 16px 48px rgba(44,26,14,.15);
+    --transition:    .3s cubic-bezier(.4,0,.2,1);
+}
+
+body {
+    font-family: 'Jost', sans-serif;
+}
+
+h1, h2, h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.bg-light-section {
+    background-color: var(--sand);
+}
+
+.main-header.scrolled {
+    background: rgba(44, 26, 14, 0.88);
+}
+
+.logo {
+    font-style: italic;
+}
+
+.logo i {
+    font-style: normal;
+}
+
+.nav-links a {
+    font-family: 'Jost', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.hero h1 {
+    font-style: italic;
+    font-weight: 600;
+}
+
+.btn {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.faq-card {
+    border-left: none;
+    border-bottom: 3px solid var(--forest);
+}
+
+.form-group input,
+.form-group textarea {
+    border: 1.5px solid var(--sand);
+}
+
+.footer-logo {
+    font-style: italic;
+}
+
+.footer-logo i {
+    font-style: normal;
+}
+
+.footer-tagline {
+    font-family: 'Cormorant Garamond', serif;
+}

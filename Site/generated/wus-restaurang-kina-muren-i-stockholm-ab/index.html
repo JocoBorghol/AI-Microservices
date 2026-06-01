@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wu's Restaurang Kina Muren i Stockholm AB - Autentiska smaker i hjärtat av Stockholm</title>
+
+    <!-- Google Fonts: Fraunces (display) + DM Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="main-header" id="site-header">
+        <nav>
+            <div class="logo">
+                <img id="custom-logo" src="images/logo.png" alt="Wu's Restaurang Kina Muren i Stockholm AB" style="max-height: 45px; width: auto; object-fit: contain; display: none;" onload="this.style.display='block'; document.getElementById('company-text').style.display='none';" onerror="this.src='images/logo.svg'; this.onerror=function(){ this.style.display='none'; document.getElementById('company-text').style.display='inline'; };">
+                <span id="company-text" style="font-family: 'Fraunces', 'DM Sans', sans-serif;">Wu's Restaurang Kina Muren i Stockholm AB</span>
+            </div>
+            <ul class="nav-links" id="nav-menu">
+                <li><a href="#om-oss">Om oss</a></li>
+                <li><a href="#tjanster">Tjänster</a></li>
+                <li><a href="#faq">Frågor & Svar</a></li>
+                <li><a href="#kontakt" class="cta-nav">Begär offert</a></li>
+            </ul>
+            <div class="menu-toggle" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section class="hero" style="background-image: url('images/hero.jpg');">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <span class="hero-eyebrow">Välkommen</span>
+                <h1>Din destination för genuin kinesisk matkultur</h1>
+                <p class="hero-text">Välkommen till en restaurangupplevelse där traditionella recept möter fräscha råvaror. Vi erbjuder en inbjudande miljö på Odengatan som passar lika bra för en avslappnad middag med vännerna som för företagslunchen.</p>
+                <div class="cta-group">
+                    <a href="#kontakt" class="btn btn-primary">Boka bord</a>
+                    <a href="tel:08-31 00 00" class="btn btn-outline"><i class="fas fa-phone"></i> Se vår meny</a>
+                </div>
+            </div>
+            <!-- Scroll indicator -->
+            <a href="#trust-band" class="scroll-indicator" aria-label="Scrolla ned">
+                <span class="scroll-dot"></span>
+            </a>
+        </section>
+
+        <!-- TRUST BAND -->
+        <section class="trust-band" id="trust-band">
+            <div class="container trust-grid">
+                <div class="trust-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Autentisk smak</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Centralt läge</span>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Erfaren service</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- VALUES -->
+        <section class="values-section">
+            <div class="container grid-3">
+                
+                        <div class='value-card fade-in'>
+                            <i class='fas fa-utensils'></i>
+                            <h3>Kvalitet</h3>
+                            <p>Vi väljer noggrant ut våra råvaror för att säkerställa att varje rätt håller högsta tänkbara klass.</p>
+                        </div>
+                        <div class='value-card fade-in'>
+                            <i class='fas fa-smile'></i>
+                            <h3>Gästvänlighet</h3>
+                            <p>Vår ambition är att varje besökare ska känna sig som hemma genom personlig och uppmärksam service.</p>
+                        </div>
+                        <div class='value-card fade-in'>
+                            <i class='fas fa-award'></i>
+                            <h3>Tradition</h3>
+                            <p>Vi förvaltar kinesiska matlagningstraditioner med stolthet och passion för att ge dig en unik smakupplevelse.</p>
+                        </div>
+            </div>
+        </section>
+
+        <!-- OM OSS -->
+        <section id="om-oss" class="story-section bg-light">
+            <div class="container grid-2-text">
+                <div class="text-content fade-in">
+                    <h2 class="section-subtitle">Om oss</h2>
+                    <h2 class="section-title">En matresa på Odengatan</h2>
+                    <p>I hjärtat av Vasastan har vi under lång tid varit en självklar mötesplats för alla som uppskattar genuin mat från det kinesiska köket. Hos oss står hantverket i fokus, där varje kryddning och tillagningsmetod är vald med stor omsorg för att skapa en balanserad och välsmakande helhet.</p><p>Vi vänder oss till alla som söker en smakrik paus i vardagen, oavsett om det är för en snabb lunch eller en längre middag. Med vår centrala placering på Odengatan är vi stolta över att kunna erbjuda en plats för både privatpersoner och företag att avnjuta högkvalitativ mat i en trivsam miljö.</p>
+                    <div class="anders-contact desktop-only-btn">
+                        <a href="tel:08-31 00 00" class="btn btn-primary"><i class="fas fa-phone-alt"></i> Boka bord</a>
+                    </div>
+                </div>
+                <div class="image-content fade-in">
+                    <img src="images/about.jpg" alt="Teamet" class="rounded-shadow">
+                    <div class="anders-contact mobile-only-btn" style="margin-top: 1.5rem; text-align: center;">
+                        <a href="tel:08-31 00 00" class="btn btn-primary"><i class="fas fa-phone-alt"></i> Boka bord</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TJÄNSTER -->
+        <section id="tjanster" class="container">
+            <h2 class="section-title center-text">Våra tjänster</h2>
+            <div class="grid-3">
+                
+                        <article class='service-card service-card-no-image fade-in'>
+                            <div class='card-body'>
+                                <h3>Restaurangbesök</h3>
+                                <p>Njut av en smakrik lunch eller middag i våra lokaler där vi kombinerar klassiska rätter med en modern touch.</p>
+                            </div>
+                        </article>
+                        <article class='service-card service-card-no-image fade-in'>
+                            <div class='card-body'>
+                                <h3>Takeaway</h3>
+                                <p>Ta med dig restaurangkänslan hem. Vi erbjuder hela vår meny som takeaway för en enkel och god måltid var du än befinner dig.</p>
+                            </div>
+                        </article>
+                        <article class='service-card service-card-no-image fade-in'>
+                            <div class='card-body'>
+                                <h3>Företagslunch</h3>
+                                <p>Vi välkomnar företagssällskap för både affärsluncher och representativa middagar i en professionell och rofylld miljö.</p>
+                            </div>
+                        </article>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section id="faq" class="container bg-light-section">
+            <h2 class="section-title center-text">Vanliga frågor</h2>
+            <div class="grid-3">
+                <div class='faq-card fade-in'>
+                    <h3><i class='fas fa-map-marker-alt'></i> Behöver man boka bord i förväg?</h3>
+                    <p>Det är alltid rekommenderat att boka bord för att garantera plats, särskilt under kvällar och helger, men vi välkomnar självklart drop-in i mån av plats.</p>
+                </div>
+                <div class='faq-card fade-in'>
+                    <h3><i class='fas fa-clock'></i> Kan ni anpassa maten vid allergier?</h3>
+                    <p>Absolut. Meddela vår personal om dina allergier eller önskemål så gör vi vårt yttersta för att anpassa din måltid på ett tryggt och säkert sätt.</p>
+                </div>
+                <div class='faq-card fade-in'>
+                    <h3><i class='fas fa-shield-alt'></i> Tar ni emot större sällskap?</h3>
+                    <p>Vi tar gärna emot sällskap. För större grupper eller företagsevent rekommenderar vi att ni kontaktar oss via telefon i god tid så att vi kan förbereda ert besök på bästa sätt.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- KONTAKT -->
+        <section id="kontakt" class="contact-section bg-navy text-white">
+            <div class="container grid-2-text">
+                <div class="contact-info fade-in">
+                    <h2>Hör av dig till oss!</h2>
+                    <p class="text-white-opacity">Vi ser fram emot att hälsa dig välkommen</p>
+                    <div class="direct-contact">
+                        <div class="dc-item">
+                            <i class="fas fa-user-circle"></i>
+                            <div><strong>Teamet </strong><span>Restaurangansvariga</span></div>
+                        </div>
+                        
+                        <div class="dc-item">
+                            <i class="fas fa-phone"></i>
+                            <div><strong>Telefon </strong><a href="tel:08-31 00 00" class="contact-link">08-31 00 00</a></div>
+                        </div>
+                        <div class="dc-item">
+                            <i class="fas fa-envelope"></i>
+                            <div><strong>E-post </strong><a href="mailto:info@kinamuren.se" class="contact-link">info@kinamuren.se</a></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-card-dark fade-in">
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <input type="text" id="name" placeholder=" " required>
+                            <label for="name">Ditt namn</label>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="phone" placeholder=" " required>
+                            <label for="phone">Telefonnummer</label>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="message" rows="4" placeholder=" " required></textarea>
+                            <label for="message">Vad kan vi hjälpa dig med?</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary full-width pulse-btn">Skicka förfrågan</button>
+                        <p id="form-status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="main-footer bg-dark">
+        <div class="container center-text">
+            <div class="footer-logo">
+                <img class="custom-logo-footer" src="images/logo.png" alt="Wu's Restaurang Kina Muren i Stockholm AB" style="max-height: 45px; width: auto; object-fit: contain; display: none;" onload="this.style.display='block'; document.getElementById('footer-company-text').style.display='none';" onerror="this.src='images/logo.svg'; this.onerror=function(){ this.style.display='none'; document.getElementById('footer-company-text').style.display='inline'; };">
+                <span id="footer-company-text" style="font-family: 'Fraunces', 'DM Sans', sans-serif;">Wu's Restaurang Kina Muren i Stockholm AB</span>
+            </div>
+            <p class="footer-tagline">Autentiska smaker i hjärtat av Stockholm</p>
+            <div class="social-icons">
+                
+                
+            </div>
+            <p class="footer-copy">&copy; 2026 Wu's Restaurang Kina Muren i Stockholm AB | Teamet</p>
+        </div>
+    </footer>
+
+    <!-- LIGHTBOX MODAL för bildgalleri -->
+    <div id="lightbox-modal" class="lightbox-modal">
+        <div class="lightbox-backdrop" onclick="closeLightbox()"></div>
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox()" aria-label="Stäng">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)" aria-label="Föregående bild">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="lightbox-image-container">
+                <img id="lightbox-image" src="" alt="Tjänstebild">
+                <div class="lightbox-counter" id="lightbox-counter"></div>
+            </div>
+            
+            <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)" aria-label="Nästa bild">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // === LIGHTBOX GLOBAL STATE ===
+        let lightboxImages = [];
+        let currentLightboxIndex = 0;
+
+        // === DYNAMISK BILDINJICERING FÖR TJÄNSTEKORT MED GALLERI-UPPTÄCKT ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const serviceCards = document.querySelectorAll('#tjanster .service-card');
+            
+            serviceCards.forEach(async (card, index) => {
+                const serviceNumber = index + 1;
+                const cardBody = card.querySelector('.card-body');
+                
+                if (cardBody) {
+                    // Kontrollera om bildtagg redan finns (från backend-rendering)
+                    let img = card.querySelector('.service-img');
+                    const isNewImg = !img;
+                    
+                    if (isNewImg) {
+                        // Skapa bildtagg för huvudbilden
+                        img = document.createElement('img');
+                        img.src = `images/service-${serviceNumber}-1.jpg`;
+                        img.alt = cardBody.querySelector('h3')?.textContent || `Tjänst ${serviceNumber}`;
+                        img.className = 'service-img';
+                        img.style.cursor = 'pointer'; // Indikera klickbarhet
+                        
+                        // Hantera saknad huvudbild
+                        img.onerror = function() {
+                            this.style.display = 'none';
+                            card.classList.add('service-card-no-image');
+                        };
+                        
+                        // Hantera lyckad bildladdning
+                        img.onload = function() {
+                            if (this.naturalWidth > 10 && this.naturalHeight > 10) {
+                                card.classList.remove('service-card-no-image');
+                                card.classList.add('service-card-has-image');
+                            } else {
+                                this.style.display = 'none';
+                                card.classList.add('service-card-no-image');
+                            }
+                        };
+                        
+                        // Injicera bilden FÖRE card-body
+                        card.insertBefore(img, cardBody);
+                    }
+                    
+                    // === UPPTÄCK YTTERLIGARE GALLERIBILDER ===
+                    const galleryImages = [`images/service-${serviceNumber}-1.jpg`];
+                    
+                    // Testa upp till 10 ytterligare bilder
+                    for (let i = 2; i <= 10; i++) {
+                        const testUrl = `images/service-${serviceNumber}-${i}.jpg`;
+                        const exists = await checkImageExists(testUrl);
+                        if (exists) {
+                            galleryImages.push(testUrl);
+                        } else {
+                            break; // Sluta när vi inte hittar fler
+                        }
+                    }
+                    
+                    // Spara galleri-data på kortet
+                    card.dataset.gallery = JSON.stringify(galleryImages);
+                    
+                    // Lägg till klick-event för lightbox
+                    if (galleryImages.length > 0) {
+                        img.addEventListener('click', () => {
+                            openLightbox(galleryImages, 0);
+                        });
+                        
+                        // Visa indikator om det finns fler bilder
+                        if (galleryImages.length > 1) {
+                            const indicator = document.createElement('div');
+                            indicator.className = 'gallery-indicator';
+                            indicator.innerHTML = `<i class="fas fa-images"></i> ${galleryImages.length}`;
+                            img.parentElement.style.position = 'relative';
+                            img.parentElement.appendChild(indicator);
+                        }
+                    }
+                }
+            });
+        });
+
+        // Hjälpfunktion för att kolla om bild finns
+        async function checkImageExists(url) {
+            try {
+                const response = await fetch(url, { method: 'HEAD' });
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+
+        // === LIGHTBOX FUNKTIONER ===
+        function openLightbox(images, startIndex = 0) {
+            lightboxImages = images;
+            currentLightboxIndex = startIndex;
+            
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-image');
+            const counter = document.getElementById('lightbox-counter');
+            
+            img.src = lightboxImages[currentLightboxIndex];
+            counter.textContent = `${currentLightboxIndex + 1} / ${lightboxImages.length}`;
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Förhindra scrolling
+            
+            // Dölj navigeringsknappar om bara en bild
+            const prevBtn = document.querySelector('.lightbox-prev');
+            const nextBtn = document.querySelector('.lightbox-next');
+            if (lightboxImages.length <= 1) {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+            }
+            
+            // Animera in
+            setTimeout(() => modal.classList.add('lightbox-active'), 10);
+        }
+
+        function closeLightbox() {
+            const modal = document.getElementById('lightbox-modal');
+            modal.classList.remove('lightbox-active');
+            document.body.style.overflow = ''; // Återställ scrolling
+            
+            setTimeout(() => {
+                modal.style.display = 'none';
+                lightboxImages = [];
+                currentLightboxIndex = 0;
+            }, 300);
+        }
+
+        function navigateLightbox(direction) {
+            currentLightboxIndex += direction;
+            
+            // Wrap around
+            if (currentLightboxIndex < 0) {
+                currentLightboxIndex = lightboxImages.length - 1;
+            } else if (currentLightboxIndex >= lightboxImages.length) {
+                currentLightboxIndex = 0;
+            }
+            
+            const img = document.getElementById('lightbox-image');
+            const counter = document.getElementById('lightbox-counter');
+            
+            // Fade-effekt
+            img.style.opacity = '0';
+            setTimeout(() => {
+                img.src = lightboxImages[currentLightboxIndex];
+                counter.textContent = `${currentLightboxIndex + 1} / ${lightboxImages.length}`;
+                img.style.opacity = '1';
+            }, 150);
+        }
+
+        // Tangentbordsnavigering
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('lightbox-modal');
+            if (modal.style.display === 'flex') {
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') navigateLightbox(-1);
+                if (e.key === 'ArrowRight') navigateLightbox(1);
+            }
+        });
+
+        // Touch-swipe för mobil
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.getElementById('lightbox-modal')?.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        
+        document.getElementById('lightbox-modal')?.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            if (touchEndX < touchStartX - swipeThreshold) {
+                navigateLightbox(1); // Swipe left = nästa
+            }
+            if (touchEndX > touchStartX + swipeThreshold) {
+                navigateLightbox(-1); // Swipe right = föregående
+            }
+        }
+
+        // Glassmorphism header on scroll
+        const header = document.getElementById('site-header');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 60);
+        });
+
+        // Staggered fade-in via IntersectionObserver
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    entry.target.style.transitionDelay = `${i * 0.1}s`;
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Active nav link on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(sec => {
+                if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+            });
+            navLinks.forEach(a => {
+                a.classList.toggle('active', a.getAttribute('href') === `#${current}`);
+            });
+        });
+    </script>
+</body>
+</html>

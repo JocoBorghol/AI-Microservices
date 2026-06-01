@@ -1,0 +1,126 @@
+/* ============================================
+   TEMA 2: MIDNIGHT DARK
+   Känsla: Elegant, modern, premium dark mode
+   Typsnitt: Syne (display) + Inter
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+@import url('../styles.css');
+
+:root {
+    --navy:          #0d1117;
+    --navy-dark:     #080c10;
+    --forest:        #3b82f6;
+    --forest-light:  #60a5fa;
+    --accent:        #93c5fd;
+    --white:         #f0f4ff;
+    --light-grey:    #161c26;
+    --surface:       #1a2333;
+    --surface2:      #212d40;
+    --text-main:     #e8edf5;
+    --text-muted:    #8b9bb4;
+    --border:        rgba(59,130,246,.18);
+    --border-radius: 10px;
+    --radius-lg:     16px;
+    --shadow:        0 4px 20px rgba(0,0,0,.35);
+    --shadow-lg:     0 16px 48px rgba(0,0,0,.5);
+    --transition:    .3s cubic-bezier(.4,0,.2,1);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--navy);
+}
+
+h1, h2, h3 {
+    font-family: 'Syne', sans-serif;
+    color: var(--white);
+}
+
+.bg-navy {
+    background-color: var(--surface);
+    color: var(--text-main);
+}
+
+.bg-light-section {
+    background-color: var(--surface2);
+}
+
+.main-header {
+    background: rgba(13, 17, 23, 0.9);
+    border-bottom: 1px solid var(--border);
+}
+
+.main-header.scrolled {
+    background: rgba(13, 17, 23, 0.75);
+    border-bottom-color: rgba(59, 130, 246, 0.28);
+}
+
+.trust-band {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.value-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.value-card h3 {
+    color: var(--white);
+}
+
+.service-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.service-card h3 {
+    color: var(--white);
+}
+
+.story-section.bg-light h2,
+.story-section.bg-light h3 {
+    color: var(--white);
+}
+
+.rounded-shadow {
+    border: 1px solid var(--border);
+}
+
+.faq-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--forest);
+    border-left: none;
+}
+
+.faq-card h3 {
+    color: var(--white);
+}
+
+.faq-card p {
+    color: var(--text-muted);
+}
+
+.contact-section {
+    background: var(--surface) !important;
+}
+
+.contact-card-dark {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+}
+
+.form-group input,
+.form-group textarea {
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-main);
+}
+
+.main-footer {
+    border-top: 1px solid var(--border);
+}

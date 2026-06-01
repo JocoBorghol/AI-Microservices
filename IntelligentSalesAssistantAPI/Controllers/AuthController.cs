@@ -117,5 +117,72 @@ namespace IntelligentSalesAssistantAPI.Controllers
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
             return Ok(new LoginResponse(tokenString));
         }
+
+        /// <summary>
+        /// Raderar en användare från systemet (endast Admin)
+        /// </summary>
+        /// <param name="userId">ID för användaren som ska raderas</param>
+        /// <returns>Bekräftelse på radering</returns>
+        /// <response code="200">Användaren har raderats</response>
+        /// <response code="403">Om användaren inte har Admin-behörighet</response>
+        /// <response code="404">Om användaren inte finns</response>
+        [HttpDelete("users/{userId}")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                throw new NotFoundException($"Användare med ID {userId} hittades inte.");
+            }
+
+            // Förhindra att admin raderar sig själv
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserId == userId.ToString())
+            {
+                return BadRequest(new { message = "Du kan inte radera ditt eget konto." });
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = $"Användare '{user.Username}' har raderats." });
+        }
+
+        /// <summary>
+        /// Hämtar alla användare (endast Admin)
+        /// </summary>
+        /// <returns>Lista med alla användare</returns>
+        [HttpGet("users")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(List<UserDto>), StatusCodes.Status200OK)]
+        public IActionResult GetAllUsers()
+        {
+            var users = _context.Users
+                .Select(u => new UserDto
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Role = u.Role,
+                    CreatedAt = u.CreatedAt
+                })
+                .ToList();
+
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// DTO för att returnera användarinformation utan lösenordshash
+        /// </summary>
+        public class UserDto
+        {
+            public int Id { get; set; }
+            public string Username { get; set; } = string.Empty;
+            public string Role { get; set; } = string.Empty;
+            public DateTime CreatedAt { get; set; }
+        }
     }
 }

@@ -1,0 +1,77 @@
+/* ============================================
+   TEMA 1: FOREST GREEN & CREAM
+   Känsla: Organisk, jordnära, pålitlig
+   Typsnitt: Playfair Display + Lato
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Lato:wght@300;400;700&display=swap');
+@import url('../styles.css');
+
+:root {
+    --navy:          #1a3a2a;
+    --navy-dark:     #0f2318;
+    --forest:        #2d7a4f;
+    --forest-light:  #3ea068;
+    --accent:        #a8d5a2;
+    --white:         #fffef9;
+    --light-grey:    #f3f7f1;
+    --text-main:     #1a3a2a;
+    --text-muted:    #4a6358;
+    --border-radius: 6px;
+    --radius-lg:     14px;
+    --shadow:        0 4px 20px rgba(26,58,42,.09);
+    --shadow-lg:     0 14px 44px rgba(26,58,42,.15);
+    --transition:    .3s cubic-bezier(.4,0,.2,1);
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+h1, h2, h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
+.bg-light-section {
+    background-color: #e8f0e5;
+}
+
+.main-header.scrolled {
+    background: rgba(26, 58, 42, 0.85);
+}
+
+.nav-links a {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.cta-nav {
+    text-transform: uppercase !important;
+}
+
+.btn {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.value-card h3 {
+    font-family: 'Playfair Display', serif;
+}
+
+.value-card:hover {
+    border-bottom-color: var(--forest);
+    border-top-color: transparent;
+}
+
+.faq-card {
+    border-left: 5px solid var(--forest);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+.faq-card h3 {
+    font-family: 'Playfair Display', serif;
+}
+
+.main-footer {
+    background: linear-gradient(135deg, var(--navy-dark) 0%, #071509 100%);
+}

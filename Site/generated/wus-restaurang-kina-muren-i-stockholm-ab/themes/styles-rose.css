@@ -1,0 +1,27 @@
+/* ============================================
+   TEMA: ROSE (Rosa & Burgundy)
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #880e4f;
+    --navy-dark: #560027;
+    --forest: #c2185b;
+    --forest-light: #e91e63;
+    --white: #ffffff;
+    --light-grey: #fce4ec;
+    --text-main: #560027;
+    --text-muted: #ad1457;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(136,14,79,0.1);
+    --transition: 0.3s ease;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #f8bbd0; 
+}

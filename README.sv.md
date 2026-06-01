@@ -516,6 +516,30 @@ Applikationen är driftsatt i den delade miljön env-joco-inventory i resursgrup
 - Känsliga nycklar binds som miljövariabler, där t.ex. `LlmProxySettings__ApiKey` mappar mot `LlmProxySettings:ApiKey` i konfigurationen.
 - **Bästa praxis:** Nycklar lagras säkert i **Azure Key Vault** och kopplas till miljövariabler i Azure Container Apps med en systemtilldelad **Managed Identity** (med rollen `Key Vault Secrets User`), vilket gör att applikationen aldrig hanterar råa lösenord i kod eller deploy-skript.
 
+### Infrastruktur & Observability (Övervakning i produktion)
+För att säkerställa stabil drift och strikt säkerhetsefterlevnad i produktion använder infrastrukturen en centraliserad Log Analytics-arbetsyta. Denna strategi för övervakning och spårbarhet verifieras av följande konfigurationer:
+* **Granskningsloggar för Key Vault**: Diagnostikinställningar strömmar 'Audit' (granskningsloggar) och 'allMetrics' (prestandamått) till en Log Analytics-arbetsyta för att spåra och varna vid eventuell åtkomst till applikationens hemligheter. Detta visar att loggningen är korrekt aktiverad och centraliserad.
+* **Aggregerade containerloggar**: Konsol- och systemloggar från båda mikrotjänsterna samlas in och är fullt sökbara via Kusto Query Language (KQL) för live-övervakning.
+
+Konfigurationen och resultaten dokumenteras i följande bilder:
+* **[keyvault-diagnostic-settings-config.png](Docs/Images/keyvault-diagnostic-settings-config.png)**: Visar diagnostikinställningarna för Azure Key Vault-resursen, vilket bevisar att loggning och revision av hemlighetshanteringen är aktiv.
+  
+  <details>
+    <summary>Klicka för att visa dokumentation</summary>
+    <br>
+    
+    ![Konfiguration av Key Vault diagnostikinställningar](Docs/Images/keyvault-diagnostic-settings-config.png)
+  </details>
+
+* **[observability-log-analytics-overview.png](Docs/Images/observability-log-analytics-overview.png)**: Visar resultatsidan i Log Analytics-arbetsytan, vilket bevisar att system- och konsolloggar från Azure Container Apps tas emot och är sökbara via KQL.
+  
+  <details>
+    <summary>Klicka för att visa dokumentation</summary>
+    <br>
+    
+    ![Översikt av Log Analytics](Docs/Images/observability-log-analytics-overview.png)
+  </details>
+
 ### CI/CD via GitHub Actions
 Pipelinen (.github/workflows/deploy.yml) bygger, testar och driftsätter båda mikrotjänsterna automatiskt vid pull requests och push-händelser till dev och main-brancherna. För att detta ska fungera behöver du:
 1. Skapa en Service Principal i Azure CLI:

@@ -10,8 +10,16 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceAuth__ApiKey=${ServiceAuth__ApiKey}
       - Jwt__Key=${Jwt__Key}
+      - Jwt__Issuer=${Jwt__Issuer}
+      - Jwt__Audience=${Jwt__Audience}
       - AdminPassword=${AdminPassword}
       - SellerPassword=${SellerPassword}
+      - Apis__BolagsApi__ApiKey=${Apis__BolagsApi__ApiKey}
+      - Apis__Hunter__ApiKey=${Apis__Hunter__ApiKey}
+      - Apis__GooglePlaces__ApiKey=${Apis__GooglePlaces__ApiKey}
+      - Unsplash__AccessKey=${Unsplash__AccessKey}
+      - LlmProxySettings__BaseUrl=${LlmProxySettings__BaseUrl}
+      - LlmProxySettings__ApiKey=${LlmProxySettings__ApiKey}
     volumes:
       - api_data:/app/Data
     depends_on:
@@ -27,6 +35,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ServiceAuth__ApiKey=${ServiceAuth__ApiKey}
+      - GeminiSettings__ApiKey=${GeminiSettings__ApiKey}
+      - UnsplashSettings__AccessKey=${UnsplashSettings__AccessKey}
 
 volumes:
   api_data:

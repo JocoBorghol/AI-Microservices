@@ -1,6 +1,6 @@
 # Intelligent Sales Assistant Platform
 
-[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md)
+[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md) | [AI Evaluation & Security](evaluation.md)
 
 **Live Demo:** [jocoborghol.se](https://jocoborghol.se)
 
@@ -120,6 +120,11 @@ The platform implements a **microservices architecture** with two independent se
 - **Technology:** ASP.NET Core Web API, Google Gemini API integration
 - **Endpoints:** Text generation, structured website content
 - **Security:** API key validation for service-to-service communication
+
+### Architectural Decision Records (ADRs)
+For detailed engineering decisions and system designs, see our ADRs:
+- [ADR 0001: Cloud Hosting & Container Hardening](Docs/ADR/0001-val-av-molnhosting.md) - Rationale behind Azure Container Apps, Key Vault, and rootless/distroless execution.
+- [ADR 0002: Content Draft Version Control (Non-Destructive Editing)](Docs/ADR/0002-versionshantering-av-utkast.md) - Rationale behind hybrid SQLite + file storage and the original-modified file fallback pattern.
 
 ---
 
@@ -450,6 +455,9 @@ The platform implements a centralized Custom Exception Middleware to ensure robu
 ---
 
 ## Security & Hardening
+
+> [!NOTE]
+> For a detailed evaluation of our security design against Prompt Injection (OWASP LLM01) and our AI output quality criteria, please refer to the [AI Evaluation & Security Report](evaluation.md).
 
 ### Authentication Flow
 1. User authenticates with `/api/auth/login` and receives a JWT token

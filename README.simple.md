@@ -1,6 +1,6 @@
 # Intelligent Sales Assistant - Enkel version (Pedagogisk guide)
 
-[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md)
+[English](README.md) | [Svenska](README.sv.md) | [Enkel version (Svenska)](README.simple.md) | [Portfolio (English)](README.portfolio.md) | [Utvärdering & Säkerhet (AI)](evaluation.md)
 
 **Live Demo:** [jocoborghol.se](https://jocoborghol.se)
 
@@ -124,6 +124,9 @@ Nu när systemet körs i produktion ligger det på Microsofts molntjänst (Azure
 
 ## Säkerhet på ett enkelt sätt: "Gäster och Låsta Dörrar"
 
+> [!NOTE]
+> För en utförlig rapport om hur vi stoppar attacker som Prompt Injection och verifierar AI-kvaliteten, läs [Utvärdering av AI-resultat & Säkerhet](evaluation.md).
+
 För att skydda plattformen har vi infört ett antal säkerhetsspärrar (så kallad säkerhetshärdning):
 
 ### 1. Säkerhetsbur och gästanvändare (Rootless & Chiseled)
@@ -142,6 +145,13 @@ För att skydda plattformen har vi infört ett antal säkerhetsspärrar (så kal
 ### 3. Legitimation för grannar (CORS)
 > **Dörrvaktsmetaforen:**
 > När vi är hemma och testar appen lokalt är dörren lite mer öppen för enkelhetens skull (`DevPolicy`). Men när vi är i produktion i molnet har vi en strikt dörrvakt (`ApiPolicy`) som bara tillåter anrop från våra egna godkända adresser (till exempel vår frontend på `localhost:3000`). Alla andra anrop blockeras omedelbart.
+
+---
+
+## Tekniska arkitekturbeslut (ADR)
+Om du vill läsa mer ingående om de tekniska beslutsdokumenten (s.k. Architectural Decision Records) som ligger till grund för hur vi byggde systemet, kan du läsa dem här:
+- [ADR 0001: Molnhosting & container-säkerhet](Docs/ADR/0001-val-av-molnhosting.md) - Varför vi valde Azure Container Apps och hur vi härdade containrarna för rootless/distroless-körning.
+- [ADR 0002: Spara utkast utan att skriva över originalet](Docs/ADR/0002-versionshantering-av-utkast.md) - Varför vi sparar filer på disken istället för i databasen för att spara prestanda och minne (Non-Destructive Editing).
 
 ---
 

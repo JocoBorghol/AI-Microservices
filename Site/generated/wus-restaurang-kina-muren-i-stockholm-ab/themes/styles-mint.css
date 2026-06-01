@@ -1,0 +1,27 @@
+/* ============================================
+   TEMA: MINT (Mintgrön & Jade)
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #00695c;
+    --navy-dark: #004d40;
+    --forest: #26a69a;
+    --forest-light: #4db6ac;
+    --white: #ffffff;
+    --light-grey: #e0f2f1;
+    --text-main: #004d40;
+    --text-muted: #00796b;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(0,105,92,0.1);
+    --transition: 0.3s ease;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #b2dfdb; 
+}

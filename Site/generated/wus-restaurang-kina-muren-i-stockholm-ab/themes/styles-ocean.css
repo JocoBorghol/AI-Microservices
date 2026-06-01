@@ -1,0 +1,29 @@
+/* ============================================
+   TEMA: OCEAN (Blå & Turkos)
+   Byt till detta genom att ändra i index.html:
+   <link rel="stylesheet" href="themes/styles-ocean.css">
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #0b3d61;
+    --navy-dark: #072a44;
+    --forest: #0fa3b1;
+    --forest-light: #2ec4b6;
+    --white: #ffffff;
+    --light-grey: #eef6f8;
+    --text-main: #1a3a4a;
+    --text-muted: #5a7a8a;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(11,61,97,0.1);
+    --transition: 0.3s ease;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #dff0f4; 
+}

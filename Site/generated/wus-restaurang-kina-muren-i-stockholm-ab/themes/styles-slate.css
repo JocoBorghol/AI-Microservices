@@ -1,0 +1,27 @@
+/* ============================================
+   TEMA: SLATE (Grå & Blågrå)
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #455a64;
+    --navy-dark: #263238;
+    --forest: #607d8b;
+    --forest-light: #78909c;
+    --white: #ffffff;
+    --light-grey: #eceff1;
+    --text-main: #263238;
+    --text-muted: #546e7a;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(69,90,100,0.1);
+    --transition: 0.3s ease;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #cfd8dc; 
+}

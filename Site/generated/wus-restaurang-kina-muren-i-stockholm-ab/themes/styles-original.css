@@ -1,0 +1,29 @@
+/* ============================================
+   TEMA: ORIGINAL (Navy & Forest)
+   Byt till detta genom att ändra i index.html:
+   <link rel="stylesheet" href="themes/styles-original.css">
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #243A4A;
+    --navy-dark: #1a2b36;
+    --forest: #1F3A2E;
+    --forest-light: #2d5242;
+    --white: #ffffff;
+    --light-grey: #f4f7f6;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(0,0,0,0.1);
+    --transition: 0.3s ease;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #eef2f1; 
+}

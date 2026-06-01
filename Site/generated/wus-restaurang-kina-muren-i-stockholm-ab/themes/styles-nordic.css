@@ -1,0 +1,33 @@
+/* ============================================
+   TEMA: NORDIC (Ljus Skandinavisk)
+   Byt till detta genom att ändra i index.html:
+   <link rel="stylesheet" href="themes/styles-nordic.css">
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #2c3e50;
+    --navy-dark: #1e2d3d;
+    --forest: #7f8c8d;
+    --forest-light: #95a5a6;
+    --white: #ffffff;
+    --light-grey: #f7f9fa;
+    --text-main: #2c3e50;
+    --text-muted: #7f8c8d;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(44,62,80,0.08);
+    --transition: 0.3s ease;
+}
+
+body {
+    background-color: #fafcfd;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #eef1f3; 
+}

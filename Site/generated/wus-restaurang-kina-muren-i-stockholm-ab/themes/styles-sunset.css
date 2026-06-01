@@ -1,0 +1,29 @@
+/* ============================================
+   TEMA: SUNSET (Orange & Coral)
+   Byt till detta genom att ändra i index.html:
+   <link rel="stylesheet" href="themes/styles-sunset.css">
+   ============================================ */
+
+@import url('../styles.css');
+
+:root {
+    --navy: #d84315;
+    --navy-dark: #bf360c;
+    --forest: #ff6f00;
+    --forest-light: #ff8f00;
+    --white: #ffffff;
+    --light-grey: #fff3e0;
+    --text-main: #3e2723;
+    --text-muted: #6d4c41;
+    --border-radius: 8px;
+    --shadow: 0 4px 6px rgba(216,67,21,0.1);
+    --transition: 0.3s ease;
+}
+
+body, h1, h2, h3 { 
+    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+}
+
+.bg-light-section { 
+    background-color: #ffe0b2; 
+}

@@ -112,6 +112,30 @@ Instead of asking AI to generate HTML, I request only content (titles, descripti
 * **Scale to Zero**: Cost-optimized using container scaling properties (`min-replicas: 0`, `max-replicas: 3`). Containers automatically scale to 0 instances during periods of inactivity to completely eliminate idle hosting costs.
 * **Secure Registry Integration**: ACR integration uses system-assigned Managed Identity with `AcrPull` role assignments (definition `7f951dda-4ef3-4680-a075-32614d47b0d4`), avoiding the use of static administrator credentials.
 
+### Infrastructure & Observability (Production Guardrails)
+To ensure reliable operation and strict security compliance in production, the infrastructure utilizes a centralized Log Analytics Workspace. This observability and monitoring strategy is verified by the following telemetry configurations:
+* **Key Vault Audit Logs**: Diagnostic settings stream 'Audit' and 'allMetrics' telemetry to a Log Analytics Workspace to trace and alert on any access to application secrets. This verifies that logging is correctly enabled and centralized.
+* **Aggregated Container Logs**: Console and system logs from both microservices are aggregated and fully searchable via Kusto Query Language (KQL) for live monitoring.
+
+The configuration and results are documented in the following images:
+* **[keyvault-diagnostic-settings-config.png](Docs/Images/keyvault-diagnostic-settings-config.png)**: Demonstrates the diagnostic settings configuration of the Azure Key Vault resource, showing that the auditing of secrets management is active.
+  
+  <details>
+    <summary>Click to expand documentation</summary>
+    <br>
+    
+    ![Key Vault Diagnostic Settings Configuration](Docs/Images/keyvault-diagnostic-settings-config.png)
+  </details>
+
+* **[observability-log-analytics-overview.png](Docs/Images/observability-log-analytics-overview.png)**: Displays the query results view inside the Log Analytics workspace, proving that system and console log streams from Azure Container Apps are successfully captured and searchable via KQL.
+  
+  <details>
+    <summary>Click to expand documentation</summary>
+    <br>
+    
+    ![Log Analytics Overview](Docs/Images/observability-log-analytics-overview.png)
+  </details>
+
 ---
 
 ## Technical Stack

@@ -1,15 +1,15 @@
 param location string = 'italynorth'
 
-// Namn på din befintliga miljö och dess resursgrupp
+// Namn pÃ¥ din befintliga miljÃ¶ och dess resursgrupp
 param existingEnvName string = 'env-joco-inventory'
 param existingEnvRg string = 'rg-joco-dev'
 
-// Namn på ditt nya ACR och dina nya appar
+// Namn pÃ¥ ditt nya ACR och dina nya appar
 param acrName string = 'acrisastudent${uniqueString(resourceGroup().id)}'
 param serviceAName string = 'ca-intelligent-sales-api'
 param serviceBName string = 'ca-intelligent-content-engine'
 
-// Vi hämtar din EXISTERANDE miljö så att vi kan lägga till appar i den
+// Vi hÃ¤mtar din EXISTERANDE miljÃ¶ sÃ¥ att vi kan lÃ¤gga till appar i den
 resource containerAppEnv 'Microsoft.App/managedEnvironments@2023-05-01' existing = {
   name: existingEnvName
   scope: resourceGroup(existingEnvRg)
@@ -52,12 +52,25 @@ resource containerAppServiceA 'Microsoft.App/containerApps@2023-05-01' = {
             cpu: json('0.25')
             memory: '0.5Gi'
           }
+          volumeMounts: [
+            {
+              volumeName: 'sqlite-volume'
+              mountPath: '/app/Data'
+            }
+          ]
         }
       ]
       scale: {
-        minReplicas: 1
-        maxReplicas: 2
+        minReplicas: 0
+        maxReplicas: 1
       }
+      volumes: [
+        {
+          name: 'sqlite-volume'
+          storageType: 'AzureFile'
+          storageName: 'sqliteshare'
+        }
+      ]
     }
   }
 }

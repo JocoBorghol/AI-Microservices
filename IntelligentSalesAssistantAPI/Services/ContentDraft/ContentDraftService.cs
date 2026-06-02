@@ -26,9 +26,8 @@ namespace IntelligentSalesAssistantAPI.Services.ContentDraft
             _db = db;
             _logger = logger;
             
-            // Använd root Site/drafts istället för IntelligentSalesAssistantAPI/Site/drafts
-            var rootPath = Directory.GetParent(env.ContentRootPath)?.FullName ?? env.ContentRootPath;
-            _draftsBasePath = Path.Combine(rootPath, "Site", "drafts");
+            // Spara utkast i den persistenta Data-mappen
+            _draftsBasePath = Path.Combine(env.ContentRootPath, "Data", "drafts");
         }
 
         public async Task<ContentDraftResponse> CreateDraftAsync(CreateContentDraftRequest request, CancellationToken ct)

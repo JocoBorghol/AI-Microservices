@@ -10,31 +10,38 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
     /// </summary>
     public class TemplateService : ITemplateService
     {
-        // Sökvägar relativt till projektroten (en nivå upp från IntelligentSalesAssistantAPI/)
-        private static readonly string ProjectRoot = Path.GetFullPath(
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
-        private static readonly string TemplateBasePath = Path.Combine(ProjectRoot, "Site", "template");
-        private static readonly string TemplatePath = Path.Combine(ProjectRoot, "Site", "template", "index.html");
-        private static readonly string TemplateStylesPath = Path.Combine(ProjectRoot, "Site", "template", "styles.css");
-        private static readonly string TemplateJsPath = Path.Combine(ProjectRoot, "Site", "template", "app.js");
-        private static readonly string TemplateThemesPath = Path.Combine(ProjectRoot, "Site", "template", "themes");
-        private static readonly string GeneratedBasePath = Path.Combine(ProjectRoot, "Site", "generated");
+        private readonly string _templateBasePath;
+        private readonly string _templatePath;
+        private readonly string _templateStylesPath;
+        private readonly string _templateJsPath;
+        private readonly string _templateThemesPath;
+        private readonly string _generatedBasePath;
         private readonly ILogger<TemplateService> _logger;
 
-        public TemplateService(ILogger<TemplateService> logger)
+        public TemplateService(ILogger<TemplateService> logger, Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             _logger = logger;
+            
+            var contentRoot = env.ContentRootPath;
+            var parentPath = Directory.GetParent(contentRoot)?.FullName ?? contentRoot;
+
+            _templateBasePath = Path.Combine(parentPath, "Site", "template");
+            _templatePath = Path.Combine(_templateBasePath, "index.html");
+            _templateStylesPath = Path.Combine(_templateBasePath, "styles.css");
+            _templateJsPath = Path.Combine(_templateBasePath, "app.js");
+            _templateThemesPath = Path.Combine(_templateBasePath, "themes");
+            _generatedBasePath = Path.Combine(contentRoot, "Data", "generated");
         }
 
         /// <inheritdoc/>
         public async Task<string> LoadTemplateAsync(CancellationToken ct = default)
         {
-            if (!File.Exists(TemplatePath))
-                throw new TemplateException($"Mall-filen hittades inte: {TemplatePath}");
+            if (!File.Exists(_templatePath))
+                throw new TemplateException($"Mall-filen hittades inte: {_templatePath}");
 
             try
             {
-                return await File.ReadAllTextAsync(TemplatePath, ct);
+                return await File.ReadAllTextAsync(_templatePath, ct);
             }
             catch (Exception ex) when (ex is not TemplateException)
             {
@@ -56,7 +63,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                 var html = template;
                 
                 // Skapa sökväg till företagets bildmapp för local override
-                var folderPath = Path.Combine(GeneratedBasePath, sanitizedCompanyName, "images");
+                var folderPath = Path.Combine(_generatedBasePath, sanitizedCompanyName, "images");
 
                 // Enkla placeholders
                 html = html.Replace("{{COMPANY_NAME}}", content.CompanyName);
@@ -230,7 +237,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
         public async Task SaveWebsiteAsync(string companyName, string html, CancellationToken ct = default)
         {
             var sanitizedName = SanitizeCompanyName(companyName);
-            var folderPath = Path.Combine(GeneratedBasePath, sanitizedName);
+            var folderPath = Path.Combine(_generatedBasePath, sanitizedName);
 
             try
             {
@@ -238,8 +245,8 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
 
                 await File.WriteAllTextAsync(Path.Combine(folderPath, "index.html"), html, ct);
 
-                var cssSource = TemplateStylesPath;
-                var jsSource = TemplateJsPath;
+                var cssSource = _templateStylesPath;
+                var jsSource = _templateJsPath;
 
                 if (File.Exists(cssSource))
                 {
@@ -254,12 +261,12 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                 }
 
                 // Kopiera themes-mappen
-                if (Directory.Exists(TemplateThemesPath))
+                if (Directory.Exists(_templateThemesPath))
                 {
                     var themesDestPath = Path.Combine(folderPath, "themes");
                     Directory.CreateDirectory(themesDestPath);
                     
-                    foreach (var themeFile in Directory.GetFiles(TemplateThemesPath, "*.css"))
+                    foreach (var themeFile in Directory.GetFiles(_templateThemesPath, "*.css"))
                     {
                         var fileName = Path.GetFileName(themeFile);
                         var destFile = Path.Combine(themesDestPath, fileName);
@@ -267,7 +274,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                         await File.WriteAllBytesAsync(destFile, themeContent, ct);
                     }
                     
-                    _logger.LogInformation("Themes-mappen kopierad: {ThemesCount} teman", Directory.GetFiles(TemplateThemesPath, "*.css").Length);
+                    _logger.LogInformation("Themes-mappen kopierad: {ThemesCount} teman", Directory.GetFiles(_templateThemesPath, "*.css").Length);
                 }
 
                 // Skapa images-mappen med instruktionsfil
@@ -302,7 +309,7 @@ The system will automatically detect and use these images when you regenerate th
         public Task DeleteWebsiteAsync(string companyName, CancellationToken ct = default)
         {
             var sanitizedName = SanitizeCompanyName(companyName);
-            var folderPath = Path.Combine(GeneratedBasePath, sanitizedName);
+            var folderPath = Path.Combine(_generatedBasePath, sanitizedName);
 
             try
             {

@@ -216,7 +216,7 @@ if (!app.Environment.IsProduction())
 
 // Servera genererade hemsidor som statiska filer
 var projectRoot = Directory.GetCurrentDirectory(); // Redan i IntelligentSalesAssistantAPI-mappen
-var generatedPath = Path.Combine(projectRoot, "..", "Site", "generated");
+var generatedPath = Path.Combine(projectRoot, "Data", "generated");
 generatedPath = Path.GetFullPath(generatedPath); // Normalisera sökvägen
 Directory.CreateDirectory(generatedPath);
 app.UseStaticFiles(new StaticFileOptions

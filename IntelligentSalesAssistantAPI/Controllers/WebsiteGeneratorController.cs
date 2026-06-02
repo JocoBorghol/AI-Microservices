@@ -335,7 +335,7 @@ namespace IntelligentSalesAssistantAPI.Controllers
 
             // Skriv om stylesheet-länken i den genererade index.html
             var siteRoot = Path.Combine(
-                Directory.GetCurrentDirectory(), "..", "Site", "generated",
+                Directory.GetCurrentDirectory(), "Data", "generated",
                 SanitizeName(entity.CompanyName));
             var htmlPath = Path.GetFullPath(Path.Combine(siteRoot, "index.html"));
 
@@ -441,7 +441,7 @@ namespace IntelligentSalesAssistantAPI.Controllers
 
             // Bygg sökväg till images-mappen
             var siteRoot = Path.GetFullPath(Path.Combine(
-                Directory.GetCurrentDirectory(), "..", "Site", "generated",
+                Directory.GetCurrentDirectory(), "Data", "generated",
                 SanitizeName(entity.CompanyName)));
             var imagesPath = Path.Combine(siteRoot, "images");
             Directory.CreateDirectory(imagesPath);
@@ -478,7 +478,7 @@ namespace IntelligentSalesAssistantAPI.Controllers
             if (!HasWebsiteOwnership(entity)) return Forbid();
 
             var siteRoot = Path.GetFullPath(Path.Combine(
-                Directory.GetCurrentDirectory(), "..", "Site", "generated",
+                Directory.GetCurrentDirectory(), "Data", "generated",
                 SanitizeName(entity.CompanyName)));
             var htmlPath = Path.Combine(siteRoot, "index.html");
 
@@ -595,7 +595,7 @@ namespace IntelligentSalesAssistantAPI.Controllers
             if (!HasWebsiteOwnership(entity)) return Forbid();
 
             var siteRoot = Path.GetFullPath(Path.Combine(
-                Directory.GetCurrentDirectory(), "..", "Site", "generated",
+                Directory.GetCurrentDirectory(), "Data", "generated",
                 SanitizeName(entity.CompanyName)));
             var htmlPath = Path.Combine(siteRoot, "index.html");
 

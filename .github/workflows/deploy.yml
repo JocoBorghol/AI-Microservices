@@ -103,7 +103,7 @@ jobs:
           DEPLOYMENT=$(az deployment group create \
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --template-file Infrastrucure/main.bicep \
-            --parameters location=swedencentral \
+            --parameters location=swedencentral githubActionsPrincipalId=${{ secrets.AZURE_SP_OBJECT_ID }} \
             --output json)
 
           # Extrahera outputs från Bicep-deploymenten

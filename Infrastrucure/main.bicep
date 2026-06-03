@@ -22,7 +22,9 @@ param location string = 'swedencentral'
 param environmentSuffix string = 'prod'
 
 @description('Object ID för GitHub Actions Service Principal (får Key Vault Secrets Officer).')
-param githubActionsPrincipalId string = '435d77cd-ddce-4e84-9cb1-daf8a0de4686'
+@minLength(36)
+@maxLength(36)
+param githubActionsPrincipalId string
 
 // ── Namnvariabler (unika per resursgrupp) ─────────────────────────────────────
 

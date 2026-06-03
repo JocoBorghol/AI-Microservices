@@ -194,8 +194,8 @@ resource containerAppServiceA 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'sales-assistant-api'
-          // Placeholder-image – GitHub Actions ersätter denna vid första deployment
-          image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+          // Placeholder-image – mcr.microsoft.com/dotnet/samples:aspnetapp lyssnar på port 8080 vilket matchar targetPort
+          image: 'mcr.microsoft.com/dotnet/samples:aspnetapp'
           resources: {
             cpu: json('0.25')
             memory: '0.5Gi'
@@ -257,7 +257,7 @@ resource containerAppServiceB 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'content-engine'
-          image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+          image: 'mcr.microsoft.com/dotnet/samples:aspnetapp'
           resources: {
             cpu: json('0.25')
             memory: '0.5Gi'

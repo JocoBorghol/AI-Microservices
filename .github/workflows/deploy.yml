@@ -96,6 +96,29 @@ jobs:
             --location swedencentral \
             --output none
 
+      # ── STEG 2b: Registrera nödvändiga Azure-providers ─────────────────────
+      # Krävs vid nya prenumerationer där providers inte är förregistrerade.
+      - name: Register Azure resource providers
+        run: |
+          providers=(
+            "Microsoft.ContainerRegistry"
+            "Microsoft.OperationalInsights"
+            "Microsoft.KeyVault"
+            "Microsoft.Storage"
+            "Microsoft.App"
+            "Microsoft.ManagedIdentity"
+          )
+          for provider in "${providers[@]}"; do
+            state=$(az provider show --namespace "$provider" --query "registrationState" -o tsv 2>/dev/null || echo "NotRegistered")
+            if [ "$state" != "Registered" ]; then
+              echo "→ Registrerar $provider ..."
+              az provider register --namespace "$provider" --wait --output none
+              echo "  ✅ $provider klar"
+            else
+              echo "✅ $provider redan registrerad"
+            fi
+          done
+
       # ── STEG 3: Deploya Bicep-mallen och fånga outputs ─────────────────────
       - name: Deploy Bicep infrastructure
         id: bicep

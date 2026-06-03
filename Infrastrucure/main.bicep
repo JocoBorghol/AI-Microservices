@@ -39,7 +39,7 @@ var serviceBName  = 'ca-intelligent-content-engine'
 
 // ── Inbyggda roll-ID:n (ändras aldrig i Azure) ───────────────────────────────
 
-var acrPullRoleId           = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ef3-4680-a075-32614d47b0d4')
+var acrPullRoleId           = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d')
 var kvSecretsUserRoleId     = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')
 var kvSecretsOfficerRoleId  = subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7')
 

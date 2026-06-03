@@ -179,24 +179,6 @@ jobs:
           docker push "$ACR_SERVER/isa-contentengine:latest"
           docker push "$ACR_SERVER/isa-contentengine:${{ github.sha }}"
 
-      # ── STEG 8: Ladda upp hemligheter till Key Vault ────────────────────────
-      # KV-namn hämtas dynamiskt från Bicep-output.
-      # Hemlighetsnamn: dubbelunderstreck (__) ersätts med dubbelt bindestreck (--).
-      - name: Upload secrets to Key Vault
-        run: |
-          KV="${{ steps.bicep.outputs.kv_name }}"
-
-          az keyvault secret set --vault-name "$KV" --name "Jwt--Key"                  --value "${{ secrets.KV_JWT_KEY }}"             --output none
-          az keyvault secret set --vault-name "$KV" --name "ServiceAuth--ApiKey"        --value "${{ secrets.KV_SERVICE_AUTH_APIKEY }}" --output none
-          az keyvault secret set --vault-name "$KV" --name "AdminPassword"              --value "${{ secrets.KV_ADMIN_PASSWORD }}"      --output none
-          az keyvault secret set --vault-name "$KV" --name "Apis--BolagsApi--ApiKey"    --value "${{ secrets.KV_BOLAGSAPI_KEY }}"       --output none
-          az keyvault secret set --vault-name "$KV" --name "Apis--Hunter--ApiKey"       --value "${{ secrets.KV_HUNTER_KEY }}"          --output none
-          az keyvault secret set --vault-name "$KV" --name "Apis--GooglePlaces--ApiKey" --value "${{ secrets.KV_GOOGLE_PLACES_KEY }}"   --output none
-          az keyvault secret set --vault-name "$KV" --name "Unsplash--AccessKey"        --value "${{ secrets.KV_UNSPLASH_ACCESSKEY }}"  --output none
-          az keyvault secret set --vault-name "$KV" --name "LlmProxySettings--ApiKey"   --value "${{ secrets.KV_LLM_PROXY_APIKEY }}"   --output none
-          az keyvault secret set --vault-name "$KV" --name "GeminiSettings--ApiKey"     --value "${{ secrets.KV_GEMINI_KEY }}"          --output none
-
-          echo "✅ Alla hemligheter uppladdade till Key Vault: $KV"
 
       # ── STEG 9: Uppdatera Service A med ny image + KV-references ───────────
       # KV-references: Container App hämtar hemligheter via sin Managed Identity.
@@ -221,13 +203,18 @@ jobs:
               "unsplash-key=keyvaultref:${KV_URI}secrets/Unsplash--AccessKey,identityref:system" \
               "llm-proxy-apikey=keyvaultref:${KV_URI}secrets/LlmProxySettings--ApiKey,identityref:system"
 
+          # Konfigurera ACR-autentisering för Container App
+          az containerapp registry set \
+            --name "$APP" \
+            --resource-group "$RG" \
+            --server "$ACR_SERVER" \
+            --identity "system"
+
           # Uppdatera image och koppla env-variabler till secrets
           az containerapp update \
             --name "$APP" \
             --resource-group "$RG" \
             --image "$ACR_SERVER/isa-api:${{ github.sha }}" \
-            --registry-server "$ACR_SERVER" \
-            --registry-identity "system" \
             --set-env-vars \
               "Jwt__Key=secretref:jwt-key" \
               "Jwt__Issuer=IntelligentSalesAssistantAPI" \
@@ -258,12 +245,16 @@ jobs:
               "gemini-api-key=keyvaultref:${KV_URI}secrets/GeminiSettings--ApiKey,identityref:system" \
               "unsplash-key=keyvaultref:${KV_URI}secrets/Unsplash--AccessKey,identityref:system"
 
+          az containerapp registry set \
+            --name "$APP" \
+            --resource-group "$RG" \
+            --server "$ACR_SERVER" \
+            --identity "system"
+
           az containerapp update \
             --name "$APP" \
             --resource-group "$RG" \
             --image "$ACR_SERVER/isa-contentengine:${{ github.sha }}" \
-            --registry-server "$ACR_SERVER" \
-            --registry-identity "system" \
             --set-env-vars \
               "GeminiSettings__ApiKey=secretref:gemini-api-key" \
               "UnsplashSettings__AccessKey=secretref:unsplash-key"

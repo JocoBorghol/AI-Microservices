@@ -97,8 +97,11 @@ jobs:
             --output none
 
       # ── STEG 2b: Registrera nödvändiga Azure-providers ─────────────────────
-      # Krävs vid nya prenumerationer där providers inte är förregistrerade.
+      # Providers registreras en gång och sitter kvar permanent.
+      # continue-on-error: true eftersom registrering kräver prenumerationsnivå-behörighet
+      # som SP:n saknar. Körs istället manuellt för nya prenumerationer.
       - name: Register Azure resource providers
+        continue-on-error: true
         run: |
           providers=(
             "Microsoft.ContainerRegistry"

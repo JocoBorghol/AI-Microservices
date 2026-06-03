@@ -226,6 +226,8 @@ jobs:
             --name "$APP" \
             --resource-group "$RG" \
             --image "$ACR_SERVER/isa-api:${{ github.sha }}" \
+            --registry-server "$ACR_SERVER" \
+            --registry-identity "system" \
             --set-env-vars \
               "Jwt__Key=secretref:jwt-key" \
               "Jwt__Issuer=IntelligentSalesAssistantAPI" \
@@ -261,6 +263,8 @@ jobs:
             --name "$APP" \
             --resource-group "$RG" \
             --image "$ACR_SERVER/isa-contentengine:${{ github.sha }}" \
+            --registry-server "$ACR_SERVER" \
+            --registry-identity "system" \
             --set-env-vars \
               "GeminiSettings__ApiKey=secretref:gemini-api-key" \
               "UnsplashSettings__AccessKey=secretref:unsplash-key"

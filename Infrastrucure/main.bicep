@@ -178,13 +178,6 @@ resource containerAppServiceA 'Microsoft.App/containerApps@2023-05-01' = {
   properties: {
     managedEnvironmentId: containerAppEnv.id
     configuration: {
-      // ACR-autentisering via Managed Identity (adminUserEnabled = false)
-      registries: [
-        {
-          server: acr.properties.loginServer
-          identity: 'system'
-        }
-      ]
       ingress: {
         external: true
         targetPort: 8080
@@ -248,12 +241,6 @@ resource containerAppServiceB 'Microsoft.App/containerApps@2023-05-01' = {
   properties: {
     managedEnvironmentId: containerAppEnv.id
     configuration: {
-      registries: [
-        {
-          server: acr.properties.loginServer
-          identity: 'system'
-        }
-      ]
       ingress: {
         external: false           // Intern – inte nåbar utifrån internet
         targetPort: 8080

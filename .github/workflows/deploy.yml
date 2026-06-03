@@ -1,4 +1,29 @@
-name: CI/CD Pipeline
+# ==================================================================================
+# CI/CD Pipeline – ISA AI Content Assistant (Privat Azure-prenumeration)
+#
+# Autentisering: OIDC (OpenID Connect) – kräver INGEN lagrad Service Principal-nyckel.
+#
+# Nödvändiga GitHub Secrets (Settings → Secrets and variables → Actions):
+#
+#   AZURE-INLOGGNING (OIDC):
+#     AZURE_CLIENT_ID       – App Registration Client ID i din privata ISA-katalog
+#     AZURE_TENANT_ID       – Tenant ID för din privata ISA-katalog
+#     AZURE_SUBSCRIPTION_ID – Prenumerations-ID för "ISA"
+#
+#   HEMLIGHETER (laddas upp till Key Vault av pipelinen):
+#     KV_JWT_KEY                – Jwt__Key
+#     KV_SERVICE_AUTH_APIKEY    – ServiceAuth__ApiKey
+#     KV_ADMIN_PASSWORD         – AdminPassword
+#     KV_SELLER_PASSWORD        – SellerPassword
+#     KV_BOLAGSAPI_KEY          – Apis__BolagsApi__ApiKey
+#     KV_HUNTER_KEY             – Apis__Hunter__ApiKey
+#     KV_GOOGLE_PLACES_KEY      – Apis__GooglePlaces__ApiKey
+#     KV_UNSPLASH_ACCESSKEY     – Unsplash__AccessKey (delas av båda appar)
+#     KV_LLM_PROXY_APIKEY       – LlmProxySettings__ApiKey
+#     KV_GEMINI_KEY             – GeminiSettings__ApiKey
+# ==================================================================================
+
+name: CI/CD Pipeline – ISA (Privat)
 
 on:
   push:
@@ -7,71 +32,220 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  RESOURCE_GROUP: rg-isa-production
+  SERVICE_A_NAME: ca-intelligent-sales-api
+  SERVICE_B_NAME: ca-intelligent-content-engine
+
+# OIDC kräver dessa behörigheter för att hämta ett temporärt Azure-token
+permissions:
+  id-token: write   # Tillåter workflow att begära OIDC-token från GitHub
+  contents: read    # Tillåter checkout av repo
 
 jobs:
+  # ──────────────────────────────────────────────────────────────────────────────
+  # JOB 1: Bygg och validera .NET-projekt
+  # ──────────────────────────────────────────────────────────────────────────────
   build:
+    name: Build & Validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      - name: Restore Service A (API)
+      - name: Restore – Service A (API)
         run: dotnet restore IntelligentSalesAssistantAPI/IntelligentSalesAssistantAPI.csproj
 
-      - name: Restore Service B (Content Engine)
+      - name: Restore – Service B (Content Engine)
         run: dotnet restore IntelligentSalesAssistant.ContentEngine/IntelligentSalesAssistant.ContentEngine.csproj
 
-      - name: Build Service A
+      - name: Build – Service A
         run: dotnet build IntelligentSalesAssistantAPI/IntelligentSalesAssistantAPI.csproj --no-restore --configuration Release
 
-      - name: Build Service B
+      - name: Build – Service B
         run: dotnet build IntelligentSalesAssistant.ContentEngine/IntelligentSalesAssistant.ContentEngine.csproj --no-restore --configuration Release
 
+  # ──────────────────────────────────────────────────────────────────────────────
+  # JOB 2: Deploya infra + bilder + hemligheter till Azure
+  # ──────────────────────────────────────────────────────────────────────────────
   deploy:
+    name: Deploy to Azure (ISA)
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to Azure
-        uses: azure/login@v1
+      # ── STEG 1: Logga in mot Azure via OIDC ────────────────────────────────
+      - name: Log in to Azure (OIDC)
+        uses: azure/login@v2
         with:
-          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # ── STEG 2: Säkerställ att resursgruppen finns ──────────────────────────
+      - name: Ensure resource group exists
+        run: |
+          az group create \
+            --name ${{ env.RESOURCE_GROUP }} \
+            --location swedencentral \
+            --output none
+
+      # ── STEG 3: Deploya Bicep-mallen och fånga outputs ─────────────────────
+      - name: Deploy Bicep infrastructure
+        id: bicep
+        run: |
+          DEPLOYMENT=$(az deployment group create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --template-file Infrastrucure/main.bicep \
+            --parameters location=swedencentral \
+            --output json)
+
+          # Extrahera outputs från Bicep-deploymenten
+          ACR_NAME=$(echo $DEPLOYMENT | jq -r '.properties.outputs.acrName.value')
+          ACR_SERVER=$(echo $DEPLOYMENT | jq -r '.properties.outputs.acrLoginServer.value')
+          KV_NAME=$(echo $DEPLOYMENT | jq -r '.properties.outputs.keyVaultName.value')
+
+          # Spara som steg-outputs för efterföljande steg
+          echo "acr_name=$ACR_NAME"       >> $GITHUB_OUTPUT
+          echo "acr_server=$ACR_SERVER"   >> $GITHUB_OUTPUT
+          echo "kv_name=$KV_NAME"         >> $GITHUB_OUTPUT
+
+          echo "✅ ACR: $ACR_NAME ($ACR_SERVER)"
+          echo "✅ Key Vault: $KV_NAME"
+
+      # ── STEG 4: Logga in mot ACR via Managed Identity / OIDC ───────────────
       - name: Log in to Azure Container Registry
-        run: az acr login --name acrisastudentcglyfzltde77k
+        run: az acr login --name ${{ steps.bicep.outputs.acr_name }}
 
+      # ── STEG 5: Sätt upp Docker Buildx ─────────────────────────────────────
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # ── STEG 6: Bygg och pusha Service A (API) ─────────────────────────────
       - name: Build and push Service A (API)
         run: |
-          docker build -t acrisastudentcglyfzltde77k.azurecr.io/isa-api:latest -t acrisastudentcglyfzltde77k.azurecr.io/isa-api:${{ github.sha }} -f IntelligentSalesAssistantAPI/Dockerfile .
-          docker push acrisastudentcglyfzltde77k.azurecr.io/isa-api:latest
-          docker push acrisastudentcglyfzltde77k.azurecr.io/isa-api:${{ github.sha }}
+          ACR_SERVER="${{ steps.bicep.outputs.acr_server }}"
+          docker build \
+            -t "$ACR_SERVER/isa-api:latest" \
+            -t "$ACR_SERVER/isa-api:${{ github.sha }}" \
+            -f IntelligentSalesAssistantAPI/Dockerfile \
+            .
+          docker push "$ACR_SERVER/isa-api:latest"
+          docker push "$ACR_SERVER/isa-api:${{ github.sha }}"
 
+      # ── STEG 7: Bygg och pusha Service B (Content Engine) ──────────────────
       - name: Build and push Service B (Content Engine)
         run: |
-          docker build -t acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:latest -t acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }} -f IntelligentSalesAssistant.ContentEngine/Dockerfile .
-          docker push acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:latest
-          docker push acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }}
+          ACR_SERVER="${{ steps.bicep.outputs.acr_server }}"
+          docker build \
+            -t "$ACR_SERVER/isa-contentengine:latest" \
+            -t "$ACR_SERVER/isa-contentengine:${{ github.sha }}" \
+            -f IntelligentSalesAssistant.ContentEngine/Dockerfile \
+            .
+          docker push "$ACR_SERVER/isa-contentengine:latest"
+          docker push "$ACR_SERVER/isa-contentengine:${{ github.sha }}"
 
-      - name: Deploy Service A to Azure Container App
+      # ── STEG 8: Ladda upp hemligheter till Key Vault ────────────────────────
+      # KV-namn hämtas dynamiskt från Bicep-output.
+      # Hemlighetsnamn: dubbelunderstreck (__) ersätts med dubbelt bindestreck (--).
+      - name: Upload secrets to Key Vault
         run: |
-          az containerapp update \
-            --name ca-intelligent-sales-api \
-            --resource-group rg-isa-prod \
-            --image acrisastudentcglyfzltde77k.azurecr.io/isa-api:${{ github.sha }}
+          KV="${{ steps.bicep.outputs.kv_name }}"
 
-      - name: Deploy Service B to Azure Container App
+          az keyvault secret set --vault-name "$KV" --name "Jwt--Key"                  --value "${{ secrets.KV_JWT_KEY }}"             --output none
+          az keyvault secret set --vault-name "$KV" --name "ServiceAuth--ApiKey"        --value "${{ secrets.KV_SERVICE_AUTH_APIKEY }}" --output none
+          az keyvault secret set --vault-name "$KV" --name "AdminPassword"              --value "${{ secrets.KV_ADMIN_PASSWORD }}"      --output none
+          az keyvault secret set --vault-name "$KV" --name "Apis--BolagsApi--ApiKey"    --value "${{ secrets.KV_BOLAGSAPI_KEY }}"       --output none
+          az keyvault secret set --vault-name "$KV" --name "Apis--Hunter--ApiKey"       --value "${{ secrets.KV_HUNTER_KEY }}"          --output none
+          az keyvault secret set --vault-name "$KV" --name "Apis--GooglePlaces--ApiKey" --value "${{ secrets.KV_GOOGLE_PLACES_KEY }}"   --output none
+          az keyvault secret set --vault-name "$KV" --name "Unsplash--AccessKey"        --value "${{ secrets.KV_UNSPLASH_ACCESSKEY }}"  --output none
+          az keyvault secret set --vault-name "$KV" --name "LlmProxySettings--ApiKey"   --value "${{ secrets.KV_LLM_PROXY_APIKEY }}"   --output none
+          az keyvault secret set --vault-name "$KV" --name "GeminiSettings--ApiKey"     --value "${{ secrets.KV_GEMINI_KEY }}"          --output none
+
+          echo "✅ Alla hemligheter uppladdade till Key Vault: $KV"
+
+      # ── STEG 9: Uppdatera Service A med ny image + KV-references ───────────
+      # KV-references: Container App hämtar hemligheter via sin Managed Identity.
+      - name: Deploy Service A – set KV secrets & update image
         run: |
+          KV_URI="${{ steps.bicep.outputs.kv_uri }}"
+          ACR_SERVER="${{ steps.bicep.outputs.acr_server }}"
+          RG="${{ env.RESOURCE_GROUP }}"
+          APP="${{ env.SERVICE_A_NAME }}"
+          KV="${{ steps.bicep.outputs.kv_name }}"
+          KV_URI="https://$KV.vault.azure.net/"
+
+          # Sätt KV-references som Container App secrets
+          az containerapp secret set \
+            --name "$APP" \
+            --resource-group "$RG" \
+            --secrets \
+              "jwt-key=keyvaultref:${KV_URI}secrets/Jwt--Key,identityref:system" \
+              "service-auth-apikey=keyvaultref:${KV_URI}secrets/ServiceAuth--ApiKey,identityref:system" \
+              "admin-password=keyvaultref:${KV_URI}secrets/AdminPassword,identityref:system" \
+              "bolagsapi-key=keyvaultref:${KV_URI}secrets/Apis--BolagsApi--ApiKey,identityref:system" \
+              "hunter-key=keyvaultref:${KV_URI}secrets/Apis--Hunter--ApiKey,identityref:system" \
+              "google-places-key=keyvaultref:${KV_URI}secrets/Apis--GooglePlaces--ApiKey,identityref:system" \
+              "unsplash-key=keyvaultref:${KV_URI}secrets/Unsplash--AccessKey,identityref:system" \
+              "llm-proxy-apikey=keyvaultref:${KV_URI}secrets/LlmProxySettings--ApiKey,identityref:system"
+
+          # Uppdatera image och koppla env-variabler till secrets
           az containerapp update \
-            --name ca-intelligent-content-engine \
-            --resource-group rg-isa-prod \
-            --image acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }}
+            --name "$APP" \
+            --resource-group "$RG" \
+            --image "$ACR_SERVER/isa-api:${{ github.sha }}" \
+            --set-env-vars \
+              "Jwt__Key=secretref:jwt-key" \
+              "Jwt__Issuer=IntelligentSalesAssistantAPI" \
+              "Jwt__Audience=IntelligentSalesAssistantAPIUsers" \
+              "ServiceAuth__ApiKey=secretref:service-auth-apikey" \
+              "AdminPassword=secretref:admin-password" \
+              "Apis__BolagsApi__ApiKey=secretref:bolagsapi-key" \
+              "Apis__Hunter__ApiKey=secretref:hunter-key" \
+              "Apis__GooglePlaces__ApiKey=secretref:google-places-key" \
+              "Unsplash__AccessKey=secretref:unsplash-key" \
+              "LlmProxySettings__BaseUrl=http://ca-intelligent-content-engine" \
+              "LlmProxySettings__ApiKey=secretref:llm-proxy-apikey"
+
+          echo "✅ Service A uppdaterad med ny image och KV-references"
+
+      # ── STEG 10: Uppdatera Service B med ny image + KV-references ──────────
+      - name: Deploy Service B – set KV secrets & update image
+        run: |
+          KV="${{ steps.bicep.outputs.kv_name }}"
+          KV_URI="https://$KV.vault.azure.net/"
+          ACR_SERVER="${{ steps.bicep.outputs.acr_server }}"
+          RG="${{ env.RESOURCE_GROUP }}"
+          APP="${{ env.SERVICE_B_NAME }}"
+
+          az containerapp secret set \
+            --name "$APP" \
+            --resource-group "$RG" \
+            --secrets \
+              "gemini-api-key=keyvaultref:${KV_URI}secrets/GeminiSettings--ApiKey,identityref:system" \
+              "unsplash-key=keyvaultref:${KV_URI}secrets/Unsplash--AccessKey,identityref:system"
+
+          az containerapp update \
+            --name "$APP" \
+            --resource-group "$RG" \
+            --image "$ACR_SERVER/isa-contentengine:${{ github.sha }}" \
+            --set-env-vars \
+              "GeminiSettings__ApiKey=secretref:gemini-api-key" \
+              "UnsplashSettings__AccessKey=secretref:unsplash-key"
+
+          echo "✅ Service B uppdaterad med ny image och KV-references"
+
+      # ── STEG 11: Verifiera att apparna körs ────────────────────────────────
+      - name: Verify deployments
+        run: |
+          echo "📋 Container Apps status:"
+          az containerapp list \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --query "[].{Name:name, Status:properties.runningStatus, FQDN:properties.configuration.ingress.fqdn}" \
+            --output table

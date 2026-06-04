@@ -35,7 +35,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
         /// <param name="html">Färdig HTML</param>
         /// <param name="ct">Cancellation token</param>
         /// <exception cref="Exceptions.FileOperationException">Om filoperationen misslyckas</exception>
-        Task SaveWebsiteAsync(string companyName, string html, CancellationToken ct = default);
+        Task SaveWebsiteAsync(string companyName, string html, bool clearImages = false, CancellationToken ct = default);
 
         /// <summary>
         /// Raderar genererad hemsida från disk

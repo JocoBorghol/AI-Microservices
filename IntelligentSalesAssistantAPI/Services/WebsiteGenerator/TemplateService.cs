@@ -296,7 +296,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
                 }
 
                 // Skapa images-mappen med instruktionsfil
-                var imagesDestPath = Path.Combine(folderPath, "images");
+                imagesDestPath = Path.Combine(folderPath, "images");
                 Directory.CreateDirectory(imagesDestPath);
                 
                 // Skapa instruktionsfil för bilder

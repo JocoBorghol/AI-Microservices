@@ -201,7 +201,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
             
             var template = await _templateService.LoadTemplateAsync(ct);
             var html = await _templateService.RenderTemplateAsync(template, content, sanitizedName, ct);
-            await _templateService.SaveWebsiteAsync(content.CompanyName, html, ct);
+            await _templateService.SaveWebsiteAsync(content.CompanyName, html, false, ct);
 
             // Uppdatera entitet
             website.CompanyName = content.CompanyName;

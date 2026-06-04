@@ -53,6 +53,8 @@ namespace IntelligentSalesAssistantAPI.Models
         
         public DateTime? UpdatedAt { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         public ICollection<ContentDraft> ContentDrafts { get; set; } = new List<ContentDraft>();
     }
 }

@@ -67,11 +67,13 @@ jobs:
           az containerapp update \
             --name ca-intelligent-sales-api \
             --resource-group rg-isa-prod \
-            --image acrisastudentcglyfzltde77k.azurecr.io/isa-api:${{ github.sha }}
+            --image acrisastudentcglyfzltde77k.azurecr.io/isa-api:${{ github.sha }} \
+            --min-replicas 1
 
       - name: Deploy Service B to Azure Container App
         run: |
           az containerapp update \
             --name ca-intelligent-content-engine \
             --resource-group rg-isa-prod \
-            --image acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }}
+            --image acrisastudentcglyfzltde77k.azurecr.io/isa-contentengine:${{ github.sha }} \
+            --min-replicas 1

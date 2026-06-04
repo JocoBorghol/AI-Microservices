@@ -234,7 +234,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
         }
 
         /// <inheritdoc/>
-        public async Task SaveWebsiteAsync(string companyName, string html, CancellationToken ct = default)
+        public async Task SaveWebsiteAsync(string companyName, string html, bool clearImages = false, CancellationToken ct = default)
         {
             var sanitizedName = SanitizeCompanyName(companyName);
             var folderPath = Path.Combine(_generatedBasePath, sanitizedName);
@@ -242,6 +242,24 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
             try
             {
                 Directory.CreateDirectory(folderPath);
+
+                var imagesDestPath = Path.Combine(folderPath, "images");
+                if (clearImages && Directory.Exists(imagesDestPath))
+                {
+                    try
+                    {
+                        var files = Directory.GetFiles(imagesDestPath);
+                        foreach (var file in files)
+                        {
+                            File.Delete(file);
+                        }
+                        _logger.LogInformation("Rensade befintliga bilder i {Path}", imagesDestPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Kunde inte rensa bilder i {Path}", imagesDestPath);
+                    }
+                }
 
                 await File.WriteAllTextAsync(Path.Combine(folderPath, "index.html"), html, ct);
 

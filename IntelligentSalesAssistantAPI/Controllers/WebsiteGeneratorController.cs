@@ -503,14 +503,14 @@ namespace IntelligentSalesAssistantAPI.Controllers
             if (request.Phone is not null)
             {
                 html = Rx(html, @"href=""tel:[^""]*""", $@"href=""tel:{request.Phone}""");
-                html = Rx(html, @"(<a href=""tel:[^""]*""[^>]*>)[^<]*(</a>)", $"$1{Enc(request.Phone)}$2");
+                html = Rx(html, @"(<a href=""tel:[^""]*""[^>]*>)[^<]*(</a>)", $"${{1}}{Enc(request.Phone)}${{2}}");
             }
 
             // E-post — uppdatera href och synlig text
             if (request.Email is not null)
             {
                 html = Rx(html, @"href=""mailto:[^""]*""", $@"href=""mailto:{request.Email}""");
-                html = Rx(html, @"(<a href=""mailto:[^""]*""[^>]*>)[^<]*(</a>)", $"$1{Enc(request.Email)}$2");
+                html = Rx(html, @"(<a href=""mailto:[^""]*""[^>]*>)[^<]*(</a>)", $"${{1}}{Enc(request.Email)}${{2}}");
             }
 
             // Adress — ta bort befintlig och lägg till ny

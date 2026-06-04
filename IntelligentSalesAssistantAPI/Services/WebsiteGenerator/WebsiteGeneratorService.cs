@@ -124,7 +124,7 @@ namespace IntelligentSalesAssistantAPI.Services.WebsiteGenerator
             var html = await _templateService.RenderTemplateAsync(template, content, sanitizedName, ct);
 
             // Steg 7: Spara filer
-            await _templateService.SaveWebsiteAsync(content.CompanyName, html, ct);
+            await _templateService.SaveWebsiteAsync(content.CompanyName, html, clearImages: true, ct);
             // Steg 8: Spara metadata i databas
             var website = new CompanyWebsite
             {

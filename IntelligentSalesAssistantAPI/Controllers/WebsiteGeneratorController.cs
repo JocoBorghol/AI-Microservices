@@ -60,9 +60,10 @@ namespace IntelligentSalesAssistantAPI.Controllers
 
             var username = User.Identity?.Name;
             var isAdmin = User.IsInRole("Admin");
-            if (!isAdmin && !string.IsNullOrEmpty(username))
+            if (!isAdmin)
             {
-                query = query.Where(x => x.CreatedBy == username);
+                // Non-admins only see their own non-deleted websites
+                query = query.Where(x => !x.IsDeleted && (!string.IsNullOrEmpty(username) && x.CreatedBy == username));
             }
 
             if (!string.IsNullOrWhiteSpace(category))
@@ -86,7 +87,9 @@ namespace IntelligentSalesAssistantAPI.Controllers
                     x.CreatedAt,
                     x.UpdatedAt,
                     x.Theme,
-                    null))
+                    null,
+                    x.CreatedBy,
+                    x.IsDeleted))
                 .ToListAsync();
 
             return Ok(new WebsiteListResponse(websites.Count, websites));
@@ -122,7 +125,9 @@ namespace IntelligentSalesAssistantAPI.Controllers
                 entity.CreatedAt,
                 entity.UpdatedAt,
                 entity.Theme,
-                entity.GeneratedContentJson));
+                entity.GeneratedContentJson,
+                entity.CreatedBy,
+                entity.IsDeleted));
         }
 
         /// <summary>
@@ -276,9 +281,10 @@ namespace IntelligentSalesAssistantAPI.Controllers
 
             if (!HasWebsiteOwnership(entity)) return Forbid();
 
-            await _templateService.DeleteWebsiteAsync(entity.CompanyName, ct);
+            // Mjuk borttagning istället för hård borttagning
+            // await _templateService.DeleteWebsiteAsync(entity.CompanyName, ct); // Raderar inte filer längre
 
-            _db.CompanyWebsites.Remove(entity);
+            entity.IsDeleted = true;
             await _db.SaveChangesAsync(ct);
 
             return NoContent();
@@ -375,7 +381,9 @@ namespace IntelligentSalesAssistantAPI.Controllers
                 entity.CreatedAt,
                 entity.UpdatedAt,
                 entity.Theme,
-                entity.GeneratedContentJson));
+                entity.GeneratedContentJson,
+                entity.CreatedBy,
+                entity.IsDeleted));
         }
 
         // Hjälpmetod för att undvika beroende på TemplateService i LINQ-queries
@@ -919,7 +927,7 @@ namespace IntelligentSalesAssistantAPI.Controllers
 
             var sanitizedName = SanitizeName(entity.CompanyName);
             var siteRoot = Path.GetFullPath(Path.Combine(
-                Directory.GetCurrentDirectory(), "..", "Site", "generated", sanitizedName));
+                Directory.GetCurrentDirectory(), "Data", "generated", sanitizedName));
 
             if (!Directory.Exists(siteRoot))
             {

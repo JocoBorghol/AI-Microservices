@@ -144,7 +144,13 @@ namespace IntelligentSalesAssistantAPI.DTOs
         string Theme = "original",
         
         // <example>{}</example>
-        string? GeneratedContentJson = null
+        string? GeneratedContentJson = null,
+        
+        // <example>seller1</example>
+        string CreatedBy = "anonymous",
+        
+        // <example>false</example>
+        bool IsDeleted = false
     );
 
     /// <summary>

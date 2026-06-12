@@ -354,11 +354,22 @@ namespace IntelligentSalesAssistantAPI.Controllers
                     ? "<link rel=\"stylesheet\" href=\"styles.css\">"
                     : $"<link rel=\"stylesheet\" href=\"themes/styles-{entity.Theme}.css\">";
 
-                // Ersatt båda möjliga format
+                // Robust regex: matchar oavsett attributordning (rel/href), citattecken (' eller ") och whitespace
+                var themePattern = @"<link\b[^>]*\bhref=[""'](styles\.css|themes/styles-[\w-]+\.css)[""'][^>]*>";
+                var htmlBefore = html;
                 html = System.Text.RegularExpressions.Regex.Replace(
                     html,
-                    @"<link\s+rel=""stylesheet""\s+href=""(styles\.css|themes/styles-[\w-]+\.css)""\s*>",
-                    newLink);
+                    themePattern,
+                    newLink,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                if (html == htmlBefore)
+                {
+                    _logger.LogWarning(
+                        "Tema-regex hittade ingen stylesheet-länk i HTML för {CompanyName}. " +
+                        "Kontrollera att index.html innehåller en <link href=\"styles.css\"> eller <link href=\"themes/styles-*.css\">.",
+                        entity.CompanyName);
+                }
 
                 await System.IO.File.WriteAllTextAsync(htmlPath, html, ct);
                 _logger.LogInformation(
